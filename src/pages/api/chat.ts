@@ -148,7 +148,8 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (err) {
     const status = err instanceof GeminiError ? (err.status === 429 ? 429 : 502) : 500;
-    const message = err instanceof Error ? err.message : 'unknown error';
+    const message = err instanceof GeminiError ? `upstream ${err.status}` : 'internal error';
+    console.error('gemini call failed', err instanceof Error ? err.message.slice(0, 300) : err);
     await logAiCall(e, body.sessionId, locale, step, {
       prompt_version: version, model, tokens_in: tokensIn, tokens_out: tokensOut, latency_ms: Date.now() - started, verifier: 'error',
     });

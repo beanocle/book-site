@@ -22,7 +22,7 @@ jobs:
         run: python tools/check_secrets.py
       - name: Key-shaped strings anywhere in the tree
         run: |
-          if git grep -nE 'AIza[0-9A-Za-z_-]{35}' -- . ':!tools/check_secrets.py'; then
+          if git grep -nE 'AIza[0-9A-Za-z_-]{35}|AQ\.[0-9A-Za-z_-]{30,}' -- . ':!tools/check_secrets.py'; then
             echo "A Google API key shape was found"; exit 1; fi
       - name: Generate Worker types (git-ignored, needed by astro check)
         run: npx wrangler types

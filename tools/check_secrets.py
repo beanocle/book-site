@@ -43,8 +43,10 @@ PATTERNS = [
     ('S/4HANA Cloud 租户主机名',
      re.compile(r'\bmy\d{6}(?:-api)?\.s4hana\.cloud\.sap\b', re.I)),
     # Google API 密钥形状（Gemini 密钥即此形状）
-    ('Google API 密钥形状',
+    ('Google API 密钥形状（旧式 AIza…）',
      re.compile(r'\bAIza[0-9A-Za-z_-]{35}\b')),
+    ('Google API 密钥形状（新式 AQ.…）',
+     re.compile(r'\bAQ\.[0-9A-Za-z_-]{30,}')),
     ('Cloudflare API Token 被赋了字面值',
      re.compile(r'(?i)CLOUDFLARE_API_TOKEN\s*[:=]\s*["\']?[A-Za-z0-9_-]{20,}')),
     ('GEMINI_API_KEY 被赋了字面值',

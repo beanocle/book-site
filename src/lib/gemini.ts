@@ -23,7 +23,8 @@ export interface GeminiResult {
   latencyMs: number;
 }
 
-export const DEFAULT_MODEL = 'gemini-2.5-flash';
+// 2026-10 起 gemini-2.5-flash 不再对新用户开放；可用模型以 API 的 models 列表为准。
+export const DEFAULT_MODEL = 'gemini-3.5-flash';
 
 export async function generate(opts: GeminiOptions): Promise<GeminiResult> {
   const model = opts.model || DEFAULT_MODEL;
