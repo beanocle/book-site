@@ -6,7 +6,7 @@
 // 额度保护：每会话最多 MAX_CALLS_PER_SESSION 次，全站每日最多 MAX_CALLS_PER_DAY 次（按 D1 里的 ai_call 事件计数）。
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { generate, GeminiError, DEFAULT_MODEL } from '../../lib/gemini';
+import { generateWithFallback, GeminiError, parseModelChain } from '../../lib/gemini';
 import { criteriaText, fill, promptVersion, responderPrompt, verifierPrompt } from '../../lib/prompts';
 import { countEvents, insertEvents, LOCALES, normalizeEvent, validateSessionId } from '../../lib/events';
 
@@ -80,7 +80,8 @@ export const POST: APIRoute = async ({ request }) => {
     if (dayCalls >= perDay) return json(429, { ok: false, error: 'daily quota exceeded' });
   }
 
-  const model = e.GEMINI_MODEL || DEFAULT_MODEL;
+  const models = parseModelChain(e.GEMINI_MODEL);
+  let model = models[0];
   const responderTemplate = responderPrompt(locale);
   const version = promptVersion(responderTemplate);
   const system = fill(responderTemplate, {
@@ -97,7 +98,8 @@ export const POST: APIRoute = async ({ request }) => {
   let tokensOut = 0;
 
   try {
-    const answer = await generate({ apiKey: e.GEMINI_API_KEY, model, system, messages, temperature: 0.4, maxOutputTokens: 800 });
+    const answer = await generateWithFallback(models, { apiKey: e.GEMINI_API_KEY, system, messages, temperature: 0.4, maxOutputTokens: 800 });
+    model = answer.model;
     tokensIn += answer.tokensIn;
     tokensOut += answer.tokensOut;
 
@@ -105,9 +107,9 @@ export const POST: APIRoute = async ({ request }) => {
     const verifierSystem = fill(verifierPrompt(locale), { STEP: `${step + 1}. ${stepName}` });
     let text = answer.text;
     try {
-      const v = await generate({
+      // 检验者优先用回答者实际成功的模型，过载时同样沿链往下
+      const v = await generateWithFallback([model, ...models.filter((m) => m !== model)], {
         apiKey: e.GEMINI_API_KEY,
-        model,
         system: verifierSystem,
         messages: [{ role: 'user', text: answer.text }],
         temperature: 0,
@@ -147,8 +149,9 @@ export const POST: APIRoute = async ({ request }) => {
       usage: { tokensIn, tokensOut, latencyMs: Date.now() - started },
     });
   } catch (err) {
-    const status = err instanceof GeminiError ? (err.status === 429 ? 429 : 502) : 500;
-    const message = err instanceof GeminiError ? `upstream ${err.status}` : 'internal error';
+    // 503 = 所有模型都过载，前端显示「稍后再试」；429 = 限流；其他上游错误统一 502
+    const status = err instanceof GeminiError ? (err.status === 429 ? 429 : err.status === 503 ? 503 : 502) : 500;
+    const message = err instanceof GeminiError ? (err.status === 503 ? 'busy' : `upstream ${err.status}`) : 'internal error';
     console.error('gemini call failed', err instanceof Error ? err.message.slice(0, 300) : err);
     await logAiCall(e, body.sessionId, locale, step, {
       prompt_version: version, model, tokens_in: tokensIn, tokens_out: tokensOut, latency_ms: Date.now() - started, verifier: 'error',

@@ -22,7 +22,7 @@ const labels = {
     course: '授業モード：この画面の操作はイベントとして記録されます（入力内容は記録しません）。',
     needPlan: '先に自分の案を書いてください。AIはそれを読んでから問いを返します。',
     rewritten: '（検証器が回答を問いの形に書き直しました）', error: 'AIの呼び出しに失敗しました。',
-    quota: '本日の利用枠に達しました。', export: '方案書をコピー',
+    quota: '本日の利用枠に達しました。', busy: 'AI が混み合っています。少し時間をおいてもう一度試してください。', export: '方案書をコピー',
   },
   en: {
     next: 'Next', back: 'Back', placeholder: 'Type here', confidence: 'Confidence',
@@ -30,7 +30,7 @@ const labels = {
     course: 'Course mode: your actions on this screen are logged as events (your text is not).',
     needPlan: 'Write your own plan first. The AI reads it and answers with questions.',
     rewritten: '(the checker rewrote the answer into questions)', error: 'The AI call failed.',
-    quota: 'The daily quota has been reached.', export: 'Copy the brief',
+    quota: 'The daily quota has been reached.', busy: 'The AI is busy right now. Please try again in a moment.', export: 'Copy the brief',
   },
   zh: {
     next: '下一步', back: '上一步', placeholder: '在此输入', confidence: '信心',
@@ -38,7 +38,7 @@ const labels = {
     course: '课程模式：本页操作会作为事件记录（不记录输入内容）。',
     needPlan: '请先写下你自己的方案。AI 读过之后才会用提问回应。',
     rewritten: '（检验者把回答改写成了提问）', error: 'AI 调用失败。',
-    quota: '今日额度已用完。', export: '复制方案书',
+    quota: '今日额度已用完。', busy: 'AI 当前繁忙，请稍后再试。', export: '复制方案书',
   },
 } as const;
 
@@ -108,6 +108,7 @@ async function ask() {
     });
     const data = (await res.json()) as { ok: boolean; text?: string; verifier?: string; error?: string };
     if (res.status === 429) { aiNote.value = l.value.quota; return; }
+    if (res.status === 503) { aiNote.value = l.value.busy; return; }
     if (!data.ok || !data.text) { aiNote.value = l.value.error; return; }
     aiText.value = data.text;
     if (data.verifier === 'rewritten') aiNote.value = l.value.rewritten;

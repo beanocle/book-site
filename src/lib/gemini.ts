@@ -70,6 +70,43 @@ export async function generate(opts: GeminiOptions): Promise<GeminiResult> {
   };
 }
 
+/** 过载、限流、超时、上游内部错误：换下一个模型重试有意义的错误 */
+function isRetryable(err: unknown): boolean {
+  if (err instanceof GeminiError) return [429, 500, 503, 504].includes(err.status);
+  return err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError');
+}
+
+/**
+ * 按顺序尝试多个模型：遇到过载 / 限流 / 超时就换下一个，其他错误（密钥无效、请求不合法等）立即抛出。
+ * 每个模型单次调用最多等 timeoutMs。返回的 result.model 是实际成功的模型。
+ */
+export async function generateWithFallback(
+  models: string[],
+  opts: Omit<GeminiOptions, 'model' | 'signal'>,
+  timeoutMs = 25_000,
+): Promise<GeminiResult> {
+  const list = models.filter(Boolean);
+  if (list.length === 0) list.push(DEFAULT_MODEL);
+  let lastErr: unknown;
+  for (const model of list) {
+    try {
+      return await generate({ ...opts, model, signal: AbortSignal.timeout(timeoutMs) });
+    } catch (err) {
+      lastErr = err;
+      if (!isRetryable(err)) throw err;
+      console.warn(`gemini ${model} unavailable, trying next`, err instanceof Error ? err.message.slice(0, 120) : err);
+    }
+  }
+  if (lastErr instanceof GeminiError) throw lastErr;
+  throw new GeminiError(503, lastErr instanceof Error ? lastErr.message : 'all models unavailable');
+}
+
+/** 环境变量 GEMINI_MODEL 可写成逗号分隔的模型链，例如 "gemini-3.5-flash,gemini-3.5-flash-lite" */
+export function parseModelChain(value: string | undefined): string[] {
+  const list = (value ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  return list.length ? list : [DEFAULT_MODEL];
+}
+
 export class GeminiError extends Error {
   status: number;
   constructor(status: number, message: string) {

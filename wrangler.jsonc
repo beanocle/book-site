@@ -16,7 +16,7 @@
 	"vars": {
 		"APP_MODE": "course",
 		"PROMPT_VERSION": "0",
-		"GEMINI_MODEL": "gemini-3.5-flash",
+		"GEMINI_MODEL": "gemini-3.5-flash,gemini-3.5-flash-lite,gemini-flash-latest",
 		"MAX_CALLS_PER_SESSION": "30",
 		"MAX_CALLS_PER_DAY": "200"
 	},
@@ -29,14 +29,14 @@
 	"env": {
 		"course": {
 			"name": "book-site-course",
-			"vars": { "APP_MODE": "course", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-3.5-flash", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "200" },
+			"vars": { "APP_MODE": "course", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-3.5-flash,gemini-3.5-flash-lite,gemini-flash-latest", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "200" },
 			"d1_databases": [
 				{ "binding": "DB", "database_name": "book-site-events", "database_id": "f5b8fc72-6f7d-4670-b588-97c2173d9177", "migrations_dir": "migrations" }
 			]
 		},
 		"production": {
 			"name": "book-site",
-			"vars": { "APP_MODE": "production", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-3.5-flash", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "500" },
+			"vars": { "APP_MODE": "production", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-3.5-flash,gemini-3.5-flash-lite,gemini-flash-latest", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "500" },
 			"d1_databases": [
 				{ "binding": "DB", "database_name": "book-site-events-prod", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
 			]
