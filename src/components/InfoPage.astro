@@ -1,0 +1,52 @@
+---
+// 作者、动态、支持、附赠模板四个页面的结构。内容待作者补充，未定部分明确标注「准备中」。
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Locale } from '../i18n/ui';
+import { kicker, ridge } from '../data/book';
+
+interface Props { locale: Locale; kind: 'author' | 'news' | 'support' | 'bonus' }
+const { locale, kind } = Astro.props;
+const u = (p: string) => getRelativeLocaleUrl(locale, p);
+
+const text = {
+  author: {
+    ja: { title: '著者', body: ['SAPの導入・運用の現場で、コアとその周りのシステムを作り、つないできた実務家。日本で働く外国人として、製品の文化と現場の文化の両方を外から見てきた。', '著者紹介は準備中です。'], quote: ridge.ja },
+    en: { title: 'Author', body: ['A practitioner who has built and connected the core and the systems around it in SAP projects, and who, as a foreigner working in Japan, has watched both the product’s culture and the field’s culture from the outside.', 'A full author profile is in preparation.'], quote: ridge.en },
+    zh: { title: '作者', body: ['在 SAP 导入与运维一线，搭建并连接核心系统及其周边系统的实务者。作为在日本工作的外国人，从外部同时看到了产品的文化与现场的文化。', '作者介绍准备中。'], quote: ridge.zh },
+  },
+  news: {
+    ja: { title: 'お知らせ', body: ['刊行情報、記事（Zenn・Qiita・note）、動画（YouTube・bilibili）をここに掲載します。', 'まだお知らせはありません。'], quote: '' },
+    en: { title: 'News', body: ['Release news, articles and videos will be listed here.', 'Nothing yet.'], quote: '' },
+    zh: { title: '动态', body: ['出版信息、文章（Zenn、Qiita、note）、视频（YouTube、B 站）会在这里发布。', '暂无动态。'], quote: '' },
+  },
+  support: {
+    ja: { title: 'サポート', body: ['サンプルコード、正誤表、質問の窓口は、本書の公開リポジトリ（GitHub）に置きます。刊行時にここからリンクします。', 'リポジトリは準備中です。'], quote: '' },
+    en: { title: 'Support', body: ['Sample code, errata and questions will live in the book’s public GitHub repository, linked from here at publication.', 'The repository is in preparation.'], quote: '' },
+    zh: { title: '支持', body: ['示例代码、勘误与提问渠道都放在本书的 GitHub 公开仓库，出版时从这里链接。', '仓库准备中。'], quote: '' },
+  },
+  bonus: {
+    ja: { title: '特典テンプレート', body: ['本書のチェックリストを、そのまま使えるテンプレートにして配布します：ギャップを埋めるはしご、プラットフォーム利用申請書、自然さチェックリスト、デプロイ阻害要因チェック表、ギャップ補完ナビのパラメーター表と発明原理対応表。', '登録フォームは準備中です。'], quote: '' },
+    en: { title: 'Bonus templates', body: ['The book’s checklists as ready-to-use templates: the gap-filling ladder, the platform request form, the deployment-blocker checklist, and the navigator’s parameter and principle tables.', 'The sign-up form is in preparation.'], quote: '' },
+    zh: { title: '附赠模板', body: ['把书中的清单做成可直接使用的模板：缺口填补阶梯、平台使用申请表、部署阻塞项检查表，以及导航用的参数表和原理对照表。', '登记表单准备中。'], quote: '' },
+  },
+}[kind][locale];
+---
+
+<header class="page-head">
+  <p class="kicker">{kicker[locale]}</p>
+  <h1>{text.title}</h1>
+</header>
+<div class="body">
+  {text.body.map((p, i) => <p class={i === text.body.length - 1 ? 'pending' : ''}>{p}</p>)}
+  {text.quote && <blockquote>{text.quote}</blockquote>}
+  {kind === 'support' && <p><a href={u('app')}>→ {locale === 'ja' ? 'ギャップ補完ナビ' : locale === 'en' ? 'Gap-filling navigator' : '缺口填补导航'}</a></p>}
+</div>
+
+<style>
+  .page-head { padding: 1rem 0 0.5rem; }
+  .kicker { color: var(--accent-2); font-weight: 700; letter-spacing: 0.12em; margin: 0; font-size: 0.85rem; }
+  h1 { font-family: var(--serif); font-size: clamp(1.8rem, 4vw, 2.5rem); margin: 0.3rem 0 0.8rem; }
+  .body { max-width: 42rem; }
+  .pending { font-size: 0.88rem; color: var(--muted); border-left: 3px solid var(--brick); padding-left: 0.75rem; }
+  blockquote { margin: 2rem 0; padding: 1rem 1.2rem; border-left: 3px solid var(--sea); background: var(--card); font-family: var(--serif); line-height: 2; }
+</style>

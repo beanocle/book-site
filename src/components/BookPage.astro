@@ -1,0 +1,96 @@
+---
+// 「关于本书」：定位、两个问题、目录（四部）、读者、本书要做的东西。
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Locale } from '../i18n/ui';
+import { builds, buildsNote, flow, intro, kicker, lead, parts, questions, readers } from '../data/book';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const u = (p: string) => getRelativeLocaleUrl(locale, p);
+const s = {
+  ja: { title: '本書について', toc: '目次', planned: '執筆予定', sample: '試し読みあり', q: '二つの問い', readers: '対象読者', build: '本書で作るもの', zhNote: '' },
+  en: { title: 'About the book', toc: 'Contents', planned: 'planned', sample: 'sample available', q: 'Two questions', readers: 'Who it is for', build: 'What you build', zhNote: '' },
+  zh: { title: '关于本书', toc: '目录', planned: '待写', sample: '可试读', q: '两个问题', readers: '写给谁', build: '本书要做出的东西', zhNote: '中文章名为暂定译名。' },
+}[locale];
+const samples = new Set(['00', '11']);
+---
+
+<header class="page-head">
+  <p class="kicker">{kicker[locale]}</p>
+  <h1>{s.title}</h1>
+  <p class="lead">{lead[locale]}</p>
+  <p class="flow">{flow[locale]}</p>
+</header>
+
+<section>
+  <h2>{s.q}</h2>
+  <ol class="qs">
+    {questions[locale].map((q) => <li><strong>{q.title}</strong><br /><span>{q.body}</span></li>)}
+  </ol>
+</section>
+
+<section>
+  <h2>{s.toc}</h2>
+  {s.zhNote && <p class="muted">{s.zhNote}</p>}
+  <ol class="toc">
+    <li class="chap">
+      <span class="no">—</span>
+      <span>{intro.title[locale]}</span>
+      <a class="tag" href={u('read/preface')}>{s.sample}</a>
+    </li>
+  </ol>
+  {parts.map((p, i) => (
+    <div class="part" id={`part-${i + 1}`}>
+      <h3>{p.title[locale]}</h3>
+      <p class="muted">{p.summary[locale]}</p>
+      <ol class="toc">
+        {p.chapters.map((c) => (
+          <li class:list={['chap', { planned: !c.built }]}>
+            <span class="no">{c.no}</span>
+            <span>{c.title[locale]}</span>
+            {samples.has(c.no) && <a class="tag" href={u('read/ch' + c.no)}>{s.sample}</a>}
+            {!c.built && <span class="tag dim">{s.planned}</span>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  ))}
+</section>
+
+<section>
+  <h2>{s.readers}</h2>
+  <dl class="readers">
+    {readers[locale].map((r) => (<><dt>{r.who}</dt><dd>{r.why}</dd></>))}
+  </dl>
+</section>
+
+<section>
+  <h2>{s.build}</h2>
+  <ul class="checks">{builds[locale].map((b) => <li>{b}</li>)}</ul>
+  <p class="serif">{buildsNote[locale]}</p>
+</section>
+
+<style>
+  .page-head { padding: 1rem 0 1.5rem; border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  .kicker { color: var(--accent-2); font-weight: 700; letter-spacing: 0.12em; margin: 0; font-size: 0.85rem; }
+  h1 { font-family: var(--serif); font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0.3rem 0 0.8rem; }
+  h2 { font-family: var(--serif); font-size: 1.5rem; margin: 2.5rem 0 1rem; }
+  h3 { font-size: 1.1rem; margin: 1.8rem 0 0.2rem; }
+  .lead { color: var(--muted); max-width: 46rem; }
+  .flow, .serif { font-family: var(--serif); font-size: 1.15rem; }
+  .muted { color: var(--muted); margin: 0.2rem 0 0.6rem; }
+  .qs { padding-left: 1.4rem; display: grid; gap: 0.8rem; }
+  .qs span { color: var(--muted); }
+  .toc { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+  .chap { display: flex; gap: 0.9rem; align-items: baseline; padding: 0.55rem 0.2rem; border-bottom: 1px solid var(--line); }
+  .chap .no { font-family: var(--serif); color: var(--accent); min-width: 2rem; }
+  .chap.planned { color: var(--muted); }
+  .tag { margin-left: auto; font-size: 0.75rem; padding: 0.1rem 0.6rem; border-radius: 999px; border: 1px solid var(--accent); text-decoration: none; white-space: nowrap; }
+  .tag.dim { border-color: var(--line); color: var(--muted); }
+  .readers { display: grid; gap: 0.2rem 1rem; }
+  .readers dt { font-weight: 700; margin-top: 0.8rem; }
+  .readers dd { margin: 0; color: var(--muted); }
+  .checks { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .checks li { padding-left: 1.8rem; position: relative; }
+  .checks li::before { content: '✓'; position: absolute; left: 0.3rem; color: var(--accent); font-weight: 700; }
+</style>

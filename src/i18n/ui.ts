@@ -35,6 +35,8 @@ export const ui = {
     'app.title': 'ギャップ補完 TRIZ ナビ',
     'app.lead': 'パッケージの標準機能と業務要件の隙間を、矛盾として捉え、発明原理から埋め方を導く。AIは設計された手順に従う部品です。',
     'footer.privacy': 'プライバシーポリシー',
+    'footer.rights': '© 著者。本サイトの文章・図の無断転載を禁じます。サンプルコードのライセンスは各リポジトリを参照。',
+    'nav.bonus': '特典テンプレート',
   },
   en: {
     'site.title': '(title to be decided)',
@@ -52,6 +54,8 @@ export const ui = {
     'app.title': 'Gap-filling TRIZ Navigator',
     'app.lead': 'Treat the gap between a packaged system and a business requirement as a contradiction, and derive how to fill it from the inventive principles. The AI is a component that follows a designed procedure.',
     'footer.privacy': 'Privacy policy',
+    'footer.rights': '© The author. Text and figures on this site may not be reproduced without permission. Sample code licences are stated in each repository.',
+    'nav.bonus': 'Bonus templates',
   },
   zh: {
     'site.title': '（书名未定）',
@@ -69,6 +73,8 @@ export const ui = {
     'app.title': '缺口填补 TRIZ 导航',
     'app.lead': '把套装系统标准功能与业务需求之间的缺口当作矛盾，从发明原理推导填补方式。AI 是按设计好的流程运转的零件。',
     'footer.privacy': '隐私政策',
+    'footer.rights': '© 作者。未经许可不得转载本站文字与图片。示例代码的许可见各仓库。',
+    'nav.bonus': '附赠模板',
   },
 } as const satisfies Record<Locale, Record<string, string>>;
 

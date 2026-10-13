@@ -1,12 +1,13 @@
 ---
-// 全站基础布局：语言属性、hreflang、导航、语言切换、页脚。
+// 全站基础布局：语言属性、hreflang、导航、语言切换、页脚、全站配色与字体。
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { locales, localeTags, t, type Locale } from '../i18n/ui';
+import { locales, localeTags, t, type Locale, type UiKey } from '../i18n/ui';
 import LangSwitch from '../components/LangSwitch.astro';
+import { kicker } from '../data/book';
 
 interface Props {
   locale: Locale;
-  /** 不含语言前缀的页面路径，如 "" 或 "app"。用于 hreflang 与语言切换。 */
+  /** 不含语言前缀的页面路径，如 "" 或 "app"。用于 hreflang、语言切换与导航高亮。 */
   path: string;
   title?: string;
   description?: string;
@@ -14,10 +15,20 @@ interface Props {
 
 const { locale, path, title, description } = Astro.props;
 const siteTitle = t(locale, 'site.title');
-const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
-const nav: Array<{ key: Parameters<typeof t>[1]; path: string }> = [
-  { key: 'nav.home', path: '' },
+const pageTitle = title ? `${title} · ${kicker[locale]}` : `${kicker[locale]} · ${siteTitle}`;
+const nav: Array<{ key: UiKey; path: string }> = [
+  { key: 'nav.book', path: 'book' },
+  { key: 'nav.read', path: 'read' },
   { key: 'nav.app', path: 'app' },
+  { key: 'nav.author', path: 'author' },
+  { key: 'nav.news', path: 'news' },
+  { key: 'nav.support', path: 'support' },
+];
+const section = path.split('/')[0];
+const footer: Array<{ key: UiKey; path: string }> = [
+  ...nav,
+  { key: 'nav.bonus', path: 'bonus' },
+  { key: 'footer.privacy', path: 'privacy' },
 ];
 ---
 
@@ -29,6 +40,7 @@ const nav: Array<{ key: Parameters<typeof t>[1]; path: string }> = [
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
+    <meta name="theme-color" content="#1f5a87" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {
       locales.map((l) => (
@@ -41,9 +53,14 @@ const nav: Array<{ key: Parameters<typeof t>[1]; path: string }> = [
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href={getRelativeLocaleUrl(locale, '')}>{siteTitle}</a>
-      <nav>
-        {nav.map((item) => <a href={getRelativeLocaleUrl(locale, item.path)}>{t(locale, item.key)}</a>)}
+      <a class="brand" href={getRelativeLocaleUrl(locale, '')}>
+        <svg viewBox="0 0 32 20" aria-hidden="true"><path d="M0 20 C8 14 12 6 16 2 C20 6 24 14 32 20" fill="none" stroke="currentColor" stroke-width="2.4" /></svg>
+        <span>{kicker[locale]}</span>
+      </a>
+      <nav aria-label="Main">
+        {nav.map((item) => (
+          <a href={getRelativeLocaleUrl(locale, item.path)} aria-current={section === item.path ? 'page' : undefined}>{t(locale, item.key)}</a>
+        ))}
       </nav>
       <LangSwitch current={locale} path={path} />
     </header>
@@ -51,39 +68,62 @@ const nav: Array<{ key: Parameters<typeof t>[1]; path: string }> = [
       <slot />
     </main>
     <footer class="site-footer">
-      <a href={getRelativeLocaleUrl(locale, 'privacy')}>{t(locale, 'footer.privacy')}</a>
+      <nav aria-label="Footer">
+        {footer.map((item) => <a href={getRelativeLocaleUrl(locale, item.path)}>{t(locale, item.key)}</a>)}
+      </nav>
+      <p class="fine">{t(locale, 'footer.rights')}</p>
     </footer>
   </body>
 </html>
 
 <style is:global>
   :root {
-    --fg: #1f2933;
-    --bg: #ffffff;
-    --muted: #52606d;
-    --accent: #0b6e4f; /* 山脊：海与旧城之间的绿线，正式配色待封面定 */
-    --line: #d9e2ec;
-    --maxw: 56rem;
+    --fg: #1d2630;
+    --bg: #fbfaf7;
+    --card: #ffffff;
+    --muted: #556270;
+    --line: #e2ddd3;
+    --sea: #1f5a87;
+    --brick: #b8442f;
+    --accent: #1f5a87;
+    --accent-2: #b8442f;
+    --maxw: 68rem;
+    --serif: 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Noto Serif JP', 'Noto Serif SC', 'Source Han Serif', Georgia, serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --fg: #e4e7eb;
-      --bg: #121619;
-      --muted: #9aa5b1;
-      --accent: #5bc49a;
-      --line: #323f4b;
+      --fg: #e7e9ec;
+      --bg: #11161c;
+      --card: #18202a;
+      --muted: #9ba7b4;
+      --line: #2b3643;
+      --sea: #5aa0d6;
+      --brick: #e07a5f;
+      --accent: #6fb2e3;
+      --accent-2: #e8917a;
     }
   }
   * { box-sizing: border-box; }
-  html { font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans SC', sans-serif; }
-  body { margin: 0; color: var(--fg); background: var(--bg); line-height: 1.7; }
+  html { font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans JP', 'Noto Sans SC', sans-serif; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; color: var(--fg); background: var(--bg); line-height: 1.75; }
   a { color: var(--accent); }
-  main { max-width: var(--maxw); margin: 0 auto; padding: 2rem 1rem; }
-  .site-header, .site-footer { max-width: var(--maxw); margin: 0 auto; padding: 1rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
-  .site-header { border-bottom: 1px solid var(--line); }
-  .site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
-  .brand { font-weight: 700; color: var(--fg); text-decoration: none; }
-  .site-header nav { display: flex; gap: 1rem; flex: 1; }
-  .site-header nav a { color: var(--fg); text-decoration: none; }
+  main { max-width: var(--maxw); margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  h1, h2, h3 { line-height: 1.4; }
+  .site-header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--bg) 88%, transparent);
+    border-bottom: 1px solid var(--line); }
+  .site-header, .site-footer { padding: 0.75rem max(1rem, calc((100vw - var(--maxw)) / 2 + 1rem)); display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--fg); text-decoration: none; letter-spacing: 0.06em; font-family: var(--serif); }
+  .brand svg { width: 28px; height: 18px; color: var(--brick); }
+  .site-header nav { display: flex; gap: 1rem; flex: 1; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+  .site-header nav a { color: var(--fg); text-decoration: none; font-size: 0.92rem; padding: 0.2rem 0; border-bottom: 2px solid transparent; }
   .site-header nav a:hover { color: var(--accent); }
+  .site-header nav a[aria-current='page'] { border-bottom-color: var(--brick); }
+  .site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; flex-direction: column; align-items: flex-start; gap: 0.5rem; padding-top: 1.5rem; padding-bottom: 2rem; }
+  .site-footer nav { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+  .site-footer a { color: var(--muted); }
+  .fine { margin: 0; }
+  @media (max-width: 640px) {
+    .site-header { gap: 0.6rem; }
+    .site-header nav { order: 3; flex-basis: 100%; }
+  }
 </style>

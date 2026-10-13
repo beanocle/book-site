@@ -1,28 +1,163 @@
 ---
-// 首页正文。三个语言的页面都渲染这个组件，只换 locale。
+// 首页。三个语言共用，只换 locale。文案在 src/data/book.ts。
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { t, type Locale } from '../i18n/ui';
+import type { Locale } from '../i18n/ui';
+import Ridge from './Ridge.astro';
+import { builds, buildsNote, channels, flow, headline, kicker, lead, parts, questions, ridge } from '../data/book';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
+const u = (p: string) => getRelativeLocaleUrl(locale, p);
+
+const s = {
+  ja: { status: '執筆中・近日刊行', read: '試し読み', app: 'ギャップ補完ナビを使う', book: '本書について', q: '本書が答える二つの問い',
+        ch: 'コアへの入口', chLead: 'どの入口も、最後は同じ検証にたどり着く。', parts: '四部構成', chapters: '章',
+        build: '本書で作るもの', ridgeTitle: '尾根に立つ', appTitle: '読む前に、手を動かす',
+        appLead: 'あなたの現場の「隙間」を、TRIZ の矛盾として言い切り、発明原理から埋め方を探す。本書の考え方をそのまま道具にしました。',
+        ridgeAlt: '片側に海と空、もう片側に赤い屋根の旧市街。その間の尾根に人が立っている。' },
+  en: { status: 'In writing · coming soon', read: 'Read a sample', app: 'Try the gap-filling navigator', book: 'About the book', q: 'Two questions the book answers',
+        ch: 'Ways into the core', chLead: 'Every way in must end at the same validation.', parts: 'Four parts', chapters: 'chapters',
+        build: 'What you build', ridgeTitle: 'Standing on the ridge', appTitle: 'Before you read, try it',
+        appLead: 'State the gap in your own system as a TRIZ contradiction, and find how to fill it from the inventive principles. The book’s way of thinking, turned into a tool.',
+        ridgeAlt: 'Sea and sky on one side, an old town with red roofs on the other, and a person standing on the ridge between them.' },
+  zh: { status: '写作中 · 即将出版', read: '试读', app: '使用缺口填补导航', book: '关于本书', q: '本书回答的两个问题',
+        ch: '通往核心的入口', chLead: '每一个入口，最后都要走到同一道校验。', parts: '四部结构', chapters: '章',
+        build: '本书要做出的东西', ridgeTitle: '站在山脊上', appTitle: '读之前，先动手',
+        appLead: '把你身边的「缺口」说成一个 TRIZ 矛盾，再从发明原理里找填补的办法。把本书的思路直接做成了工具。',
+        ridgeAlt: '一侧是海和天，另一侧是红屋顶的老城，中间的山脊上站着一个人。' },
+}[locale];
 ---
 
 <section class="hero">
-  <p class="eyebrow">{t(locale, 'home.comingSoon')}</p>
-  <h1>{t(locale, 'site.title')}</h1>
-  <p class="tagline">{t(locale, 'site.tagline')}</p>
-  <p class="actions">
-    <a class="button" href={getRelativeLocaleUrl(locale, 'app')}>{t(locale, 'home.tryApp')}</a>
-    <span class="button disabled" aria-disabled="true">{t(locale, 'home.buy')}</span>
-  </p>
+  <div class="hero-text">
+    <p class="kicker">{kicker[locale]}</p>
+    <h1>{headline[locale].split('\n').map((line) => <span>{line}</span>)}</h1>
+    <p class="lead">{lead[locale]}</p>
+    <p class="actions">
+      <a class="button primary" href={u('read')}>{s.read}</a>
+      <a class="button" href={u('app')}>{s.app}</a>
+      <span class="status">{s.status}</span>
+    </p>
+  </div>
+  <Ridge label={s.ridgeAlt} />
+</section>
+
+<section class="flow" aria-label={flow[locale]}>
+  {flow[locale].split(' → ').map((step, i, all) => (
+    <>
+      <span class={`node n${i}`}>{step}</span>
+      {i < all.length - 1 && <span class="arrow" aria-hidden="true">→</span>}
+    </>
+  ))}
+</section>
+
+<section class="block">
+  <h2>{s.q}</h2>
+  <div class="two">
+    {questions[locale].map((q, i) => (
+      <article class={`q q${i}`}>
+        <span class="qno">{i + 1}</span>
+        <h3>{q.title}</h3>
+        <p>{q.body}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="block">
+  <h2>{s.ch}</h2>
+  <p class="sub">{s.chLead}</p>
+  <ol class="channels">
+    {channels[locale].map((c, i) => <li style={`--i:${i}`}><span>{c}</span></li>)}
+  </ol>
+</section>
+
+<section class="block">
+  <h2>{s.parts}</h2>
+  <div class="parts">
+    {parts.map((p, i) => (
+      <a class="part" href={u('book') + `#part-${i + 1}`}>
+        <span class="part-no">{['I', 'II', 'III', 'IV'][i]}</span>
+        <h3>{p.title[locale].replace(/^第.部\s*|^Part \w+ — /, '')}</h3>
+        <p>{p.summary[locale]}</p>
+        <span class="count">{p.chapters.length} {s.chapters}</span>
+      </a>
+    ))}
+  </div>
+  <p><a href={u('book')}>{s.book} →</a></p>
+</section>
+
+<section class="block build">
+  <h2>{s.build}</h2>
+  <ul class="checks">{builds[locale].map((b) => <li>{b}</li>)}</ul>
+  <p class="note">{buildsNote[locale]}</p>
+</section>
+
+<section class="block app-cta">
+  <div>
+    <h2>{s.appTitle}</h2>
+    <p>{s.appLead}</p>
+  </div>
+  <a class="button primary" href={u('app')}>{s.app}</a>
+</section>
+
+<section class="block ridge-note">
+  <h2>{s.ridgeTitle}</h2>
+  <p>{ridge[locale]}</p>
 </section>
 
 <style>
-  .hero { padding: 3rem 0; }
-  .eyebrow { color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem; }
-  h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.2em 0; }
-  .tagline { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
-  .actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
-  .button { display: inline-block; padding: 0.7rem 1.4rem; border-radius: 0.4rem; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; }
-  .button.disabled { background: var(--line); color: var(--muted); }
+  .hero { display: grid; gap: 2rem; padding: 1rem 0 2rem; }
+  .kicker { display: inline-block; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-2); border: 1px solid currentColor; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.85rem; margin: 0; }
+  h1 { font-family: var(--serif); font-size: clamp(2rem, 5.2vw, 3.6rem); line-height: 1.25; margin: 0.6rem 0 0.8rem; letter-spacing: 0.02em; }
+  h1 span { display: block; }
+  .lead { font-size: 1.08rem; color: var(--muted); max-width: 46rem; }
+  .actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; margin-top: 1.5rem; }
+  .status { color: var(--muted); font-size: 0.85rem; }
+
+  .flow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.6rem; margin: 1rem 0 3rem; font-family: var(--serif); font-size: clamp(1rem, 2.4vw, 1.35rem); }
+  .node { padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--line); background: var(--card); }
+  .node.n2 { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .arrow { color: var(--muted); }
+
+  .block { margin: 3.5rem 0; }
+  .block h2 { font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 1.9rem); margin: 0 0 1rem; }
+  .sub { color: var(--muted); margin-top: -0.5rem; }
+
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+  .q { position: relative; padding: 1.4rem 1.4rem 1.2rem 1.4rem; border-radius: 0.75rem; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+  .q::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--sea); }
+  .q1::before { background: var(--brick); }
+  .qno { font-family: var(--serif); font-size: 2.4rem; line-height: 1; color: var(--line); position: absolute; right: 1rem; top: 0.8rem; }
+  .q h3 { margin: 0 2rem 0.6rem 0; font-size: 1.08rem; line-height: 1.5; }
+  .q p { margin: 0; color: var(--muted); }
+
+  .channels { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .channels li { padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.92rem; border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--brick) calc(100% - var(--i) * 14%), var(--sea)); color: #fff; }
+
+  .parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .part { display: flex; flex-direction: column; gap: 0.4rem; padding: 1.2rem; border-radius: 0.75rem; border: 1px solid var(--line); background: var(--card); color: var(--fg); text-decoration: none; transition: transform 0.15s, border-color 0.15s; }
+  .part:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .part-no { font-family: var(--serif); font-size: 1.6rem; color: var(--accent); }
+  .part h3 { margin: 0; font-size: 1.02rem; line-height: 1.5; }
+  .part p { margin: 0; color: var(--muted); font-size: 0.9rem; flex: 1; }
+  .count { font-size: 0.8rem; color: var(--muted); }
+
+  .checks { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .checks li { padding-left: 1.8rem; position: relative; }
+  .checks li::before { content: '✓'; position: absolute; left: 0.3rem; color: var(--accent); font-weight: 700; }
+  .note { font-family: var(--serif); font-size: 1.1rem; margin-top: 1rem; }
+
+  .app-cta { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; padding: 2rem; border-radius: 0.9rem;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--sea) 18%, var(--card)), color-mix(in srgb, var(--brick) 14%, var(--card))); border: 1px solid var(--line); }
+  .app-cta h2 { margin-bottom: 0.5rem; }
+  .app-cta p { margin: 0; max-width: 38rem; color: var(--muted); }
+
+  .ridge-note { text-align: center; max-width: 40rem; margin-left: auto; margin-right: auto; }
+  .ridge-note p { font-family: var(--serif); font-size: 1.08rem; line-height: 2; }
+
+  .button { display: inline-block; padding: 0.7rem 1.4rem; border-radius: 0.5rem; border: 1px solid var(--line); color: var(--fg); text-decoration: none; font-weight: 600; background: var(--card); }
+  .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .button:hover { filter: brightness(1.05); }
 </style>

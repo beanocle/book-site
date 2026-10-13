@@ -1,0 +1,90 @@
+---
+// 试读。slug 为空时显示目录；否则显示对应章节。正文由 scripts/import_excerpts.py 从书稿导入（初稿，标注草稿）。
+// 中文版暂无译稿：显示说明，并链接到日文版、英文版。
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Locale } from '../i18n/ui';
+import { kicker } from '../data/book';
+
+interface Props { locale: Locale; slug?: 'preface' | 'ch11' }
+const { locale, slug } = Astro.props;
+const u = (l: Locale, p: string) => getRelativeLocaleUrl(l, p);
+
+type Md = { frontmatter: { title: string; lang: string; slug: string; status: string; excerpt: boolean; imported: string }; Content: any };
+const all = import.meta.glob<Md>('../content/excerpts/*/*.md', { eager: true });
+const find = (lang: string, s: string) => Object.values(all).find((m) => m.frontmatter.lang === lang && m.frontmatter.slug === s);
+
+const s = {
+  ja: { title: '試し読み', draft: '草稿です。刊行時の本文とは異なります。', excerpt: '抜粋（本章の前半）', back: '試し読みの一覧へ', next: '続きは本書で。', list: '序章と第一部の最初の章を公開しています。', none: '' },
+  en: { title: 'Sample chapters', draft: 'Draft. The published text will differ.', excerpt: 'Excerpt (first half of the chapter)', back: 'All samples', next: 'The rest is in the book.', list: 'The book introduction and the first chapter of Part One.', none: '' },
+  zh: { title: '试读', draft: '草稿，与出版时的正文会有出入。', excerpt: '节选（本章前半）', back: '返回试读目录', next: '后续内容见正书。', list: '公开序章与第一部的第一章。', none: '中文译稿尚未完成，请先阅读日文版或英文版。' },
+}[locale];
+
+const lang = locale === 'zh' ? null : locale;
+const items = (['preface', 'ch11'] as const).map((k) => ({ slug: k, md: lang ? find(lang, k) : find('ja', k) }));
+const page = slug && lang ? find(lang, slug) : undefined;
+---
+
+{!slug && (
+  <>
+    <header class="page-head">
+      <p class="kicker">{kicker[locale]}</p>
+      <h1>{s.title}</h1>
+      <p class="muted">{s.list}</p>
+      {s.none && <p class="notice">{s.none}</p>}
+    </header>
+    <ul class="samples">
+      {items.map((it) => it.md && (
+        <li>
+          {lang ? (
+            <a href={u(locale, 'read/' + it.slug)}><strong>{it.md.frontmatter.title}</strong></a>
+          ) : (
+            <span><strong>{it.md.frontmatter.title}</strong> — <a href={u('ja', 'read/' + it.slug)}>日本語</a> · <a href={u('en', 'read/' + it.slug)}>English</a></span>
+          )}
+          {it.md.frontmatter.excerpt && <span class="tag">{s.excerpt}</span>}
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+
+{slug && !lang && (
+  <header class="page-head">
+    <h1>{s.title}</h1>
+    <p class="notice">{s.none}</p>
+    <p><a href={u('ja', 'read/' + slug)}>日本語</a> · <a href={u('en', 'read/' + slug)}>English</a></p>
+  </header>
+)}
+
+{page && (
+  <article class="prose">
+    <p class="kicker">{kicker[locale]}</p>
+    <h1>{page.frontmatter.title}</h1>
+    <p class="notice">{s.draft}{page.frontmatter.excerpt ? ` ${s.excerpt}` : ''}</p>
+    <page.Content />
+    <hr />
+    <p class="serif">{s.next}</p>
+    <p><a href={u(locale, 'read')}>← {s.back}</a></p>
+  </article>
+)}
+
+<style>
+  .page-head { padding: 1rem 0 1rem; }
+  .kicker { color: var(--accent-2); font-weight: 700; letter-spacing: 0.12em; margin: 0; font-size: 0.85rem; }
+  h1 { font-family: var(--serif); font-size: clamp(1.8rem, 4vw, 2.5rem); margin: 0.3rem 0 0.8rem; }
+  .muted { color: var(--muted); }
+  .notice { font-size: 0.88rem; color: var(--muted); border-left: 3px solid var(--brick); padding-left: 0.75rem; }
+  .samples { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
+  .samples li { display: flex; gap: 0.8rem; align-items: baseline; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 0.6rem; background: var(--card); }
+  .tag { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
+  .prose { max-width: 42rem; margin: 0 auto; }
+  .prose :global(h2) { font-family: var(--serif); font-size: 1.4rem; margin: 2.4rem 0 0.8rem; }
+  .prose :global(h3) { font-size: 1.1rem; margin: 1.8rem 0 0.5rem; }
+  .prose :global(p), .prose :global(li) { line-height: 1.95; }
+  .prose :global(blockquote) { margin: 1.2rem 0; padding: 0.6rem 1rem; border-left: 3px solid var(--sea); background: var(--card); font-family: var(--serif); }
+  .prose :global(code) { font-size: 0.9em; background: var(--card); padding: 0.05rem 0.3rem; border-radius: 0.25rem; border: 1px solid var(--line); }
+  .prose :global(pre) { overflow-x: auto; padding: 1rem; border-radius: 0.5rem; background: var(--card); border: 1px solid var(--line); }
+  .prose :global(table) { border-collapse: collapse; width: 100%; font-size: 0.9rem; display: block; overflow-x: auto; }
+  .prose :global(th), .prose :global(td) { border: 1px solid var(--line); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+  .serif { font-family: var(--serif); font-size: 1.1rem; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 3rem 0 1.5rem; }
+</style>

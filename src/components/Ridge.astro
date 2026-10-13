@@ -1,0 +1,117 @@
+---
+// 山脊：一侧海与天（新），一侧红砖老城（旧），人站在脊线上同时看两边。
+// 纯 SVG，无外部图片；颜色走 CSS 变量，深色模式自动切换。
+interface Props { label: string }
+const { label } = Astro.props;
+
+// 老城屋顶：x, 宽, 墙高, 屋顶高
+const houses: Array<[number, number, number, number]> = [
+  [690, 46, 34, 22], [732, 38, 46, 20], [766, 52, 30, 26], [812, 40, 52, 22], [848, 58, 38, 28],
+  [900, 44, 60, 24], [940, 50, 42, 26], [986, 40, 54, 22], [1022, 56, 36, 28], [1074, 44, 58, 24],
+  [1114, 52, 40, 26], [1162, 46, 50, 24],
+];
+const back: Array<[number, number, number, number]> = [
+  [700, 40, 58, 18], [748, 44, 66, 20], [800, 36, 72, 18], [842, 48, 62, 22], [896, 40, 78, 18],
+  [940, 46, 66, 20], [992, 42, 74, 20], [1040, 48, 62, 22], [1094, 40, 76, 18], [1138, 50, 68, 20],
+];
+const base = 400;
+---
+
+<figure class="ridge" role="img" aria-label={label}>
+  <svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--sky-top)" />
+        <stop offset="1" stop-color="var(--sky-bottom)" />
+      </linearGradient>
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--sea-top)" />
+        <stop offset="1" stop-color="var(--sea-bottom)" />
+      </linearGradient>
+      <linearGradient id="dusk" x1="1" y1="0" x2="0" y2="0">
+        <stop offset="0" stop-color="var(--dusk)" />
+        <stop offset="0.55" stop-color="var(--dusk)" stop-opacity="0" />
+      </linearGradient>
+      <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--hill-top)" />
+        <stop offset="1" stop-color="var(--hill-bottom)" />
+      </linearGradient>
+    </defs>
+
+    <rect width="1200" height="420" fill="url(#sky)" />
+    <rect width="1200" height="420" fill="url(#dusk)" />
+
+    <!-- 太阳（海的一侧） -->
+    <circle cx="190" cy="120" r="34" fill="var(--sun)" opacity="0.9" />
+
+    <!-- 海 -->
+    <rect x="0" y="292" width="640" height="128" fill="url(#sea)" />
+    <g stroke="var(--wave)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7">
+      <path d="M40 318 q20 -6 40 0 t40 0 t40 0" />
+      <path d="M210 336 q20 -6 40 0 t40 0 t40 0 t40 0" />
+      <path d="M90 360 q20 -6 40 0 t40 0" />
+      <path d="M330 312 q20 -6 40 0 t40 0" />
+      <path d="M420 352 q20 -6 40 0 t40 0 t40 0" />
+      <path d="M160 392 q20 -6 40 0 t40 0 t40 0" />
+    </g>
+    <!-- 帆 -->
+    <path d="M298 300 l0 -26 l16 24 z" fill="var(--sail)" />
+    <path d="M290 300 h30 l-5 6 h-20 z" fill="var(--sail)" />
+
+    <!-- 老城的地面 -->
+    <rect x="620" y={base - 6} width="580" height={420 - base + 6} fill="var(--wall-back)" />
+    <!-- 老城：后排 -->
+    <g fill="var(--wall-back)">
+      {back.map(([x, w, h]) => <rect x={x} y={base - h} width={w} height={h} />)}
+    </g>
+    <g fill="var(--roof-back)">
+      {back.map(([x, w, h, r]) => <path d={`M${x - 4} ${base - h} L${x + w / 2} ${base - h - r} L${x + w + 4} ${base - h} Z`} />)}
+    </g>
+    <!-- 双塔（老城的钟楼） -->
+    <g fill="var(--roof-back)">
+      <rect x="1016" y="232" width="14" height="110" fill="var(--wall-back)" />
+      <rect x="1044" y="232" width="14" height="110" fill="var(--wall-back)" />
+      <path d="M1013 232 L1023 196 L1033 232 Z" />
+      <path d="M1041 232 L1051 196 L1061 232 Z" />
+    </g>
+    <!-- 老城：前排 -->
+    <g fill="var(--wall)">
+      {houses.map(([x, w, h]) => <rect x={x} y={base - h} width={w} height={h} />)}
+    </g>
+    <g fill="var(--roof)">
+      {houses.map(([x, w, h, r]) => <path d={`M${x - 4} ${base - h} L${x + w / 2} ${base - h - r} L${x + w + 4} ${base - h} Z`} />)}
+    </g>
+    <g fill="var(--window)">
+      {houses.map(([x, w, h]) => <rect x={x + w / 2 - 4} y={base - h + 10} width="8" height="10" />)}
+    </g>
+
+    <!-- 山脊 -->
+    <path d="M440 420 C 500 360, 540 300, 600 236 C 612 224, 624 224, 636 236 C 700 300, 740 360, 800 420 Z" fill="url(#hill)" />
+    <path d="M440 420 C 500 360, 540 300, 600 236 C 612 224, 624 224, 636 236 C 700 300, 740 360, 800 420" fill="none" stroke="var(--ridge-line)" stroke-width="2.5" />
+    <!-- 山脊上的人 -->
+    <g fill="var(--figure)">
+      <circle cx="618" cy="206" r="5" />
+      <path d="M613 212 h10 l3 16 h-16 z" />
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .ridge { margin: 0; width: 100%; aspect-ratio: 1200 / 420; overflow: hidden; border-radius: 0.75rem; }
+  .ridge svg { width: 100%; height: 100%; display: block; }
+  @media (max-width: 640px) { .ridge { aspect-ratio: 4 / 3; } }
+  .ridge {
+    --sky-top: #cfe6f5; --sky-bottom: #f7ecdc; --dusk: #f3c9a8;
+    --sun: #f6d27a; --sea-top: #3f86b8; --sea-bottom: #1f5a87; --wave: #d7ecf8; --sail: #f4efe6;
+    --wall: #e9dccb; --wall-back: #d9c6b0; --roof: #b8442f; --roof-back: #9a3a29; --window: #6b4a3a;
+    --hill-top: #4f7b52; --hill-bottom: #2f5236; --ridge-line: #20382a; --figure: #17251c;
+  }
+  @media (prefers-color-scheme: dark) {
+    .ridge {
+      --sky-top: #0f1d2e; --sky-bottom: #24334a; --dusk: #4a2f3a;
+      --sun: #e9e1c4; --sea-top: #1d466a; --sea-bottom: #0e2840; --wave: #6f9cc2; --sail: #c9c3b6;
+      --wall: #5d4c41; --wall-back: #4a3c33; --roof: #8e3a2a; --roof-back: #6f2e22; --window: #f0c86a;
+      --hill-top: #2f4a35; --hill-bottom: #1b2c20; --ridge-line: #a9c7a9; --figure: #e8ede6;
+    }
+  }
+</style>
