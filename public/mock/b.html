@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>案B 書 · SAP運用最前線</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet" />
+<style>
+  :root { --paper: #f4efe6; --paper2: #ebe3d5; --ink: #1b1a17; --muted: #6d655a; --line: #d8cebd; --sea: #1d4e74; --brick: #a63a24;
+    --mincho: 'Shippori Mincho', serif; --gothic: 'Zen Kaku Gothic New', sans-serif; --latin: 'Cormorant Garamond', serif; }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--gothic); -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  a { color: inherit; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  header { border-bottom: 1px solid var(--ink); }
+  header .wrap { display: flex; align-items: baseline; gap: 32px; padding-top: 22px; padding-bottom: 16px; }
+  .mast { font-family: var(--mincho); font-weight: 800; font-size: 22px; letter-spacing: .12em; }
+  nav { flex: 1; display: flex; gap: 26px; font-size: 14px; }
+  nav a { text-decoration: none; color: var(--muted); } nav a:hover { color: var(--ink); }
+  .issue { font-family: var(--latin); font-style: italic; color: var(--muted); }
+
+  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 60px; align-items: center; padding: 70px 0 90px; border-bottom: 1px solid var(--line); }
+  .over { font-family: var(--latin); font-size: 15px; letter-spacing: .3em; text-transform: uppercase; color: var(--brick); }
+  h1 { font-family: var(--mincho); font-weight: 800; font-size: clamp(46px, 6.6vw, 92px); line-height: 1.14; margin: 18px 0 28px; letter-spacing: .01em; }
+  h1 em { font-style: normal; color: var(--sea); }
+  .deck { font-size: 18px; line-height: 2; color: var(--muted); max-width: 540px; }
+  .cta { display: flex; gap: 22px; align-items: center; margin-top: 36px; }
+  .btn { display: inline-block; padding: 14px 26px; background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; letter-spacing: .08em; }
+  .link { text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+
+  /* 立体书 */
+  .stage { perspective: 1800px; display: grid; place-items: center; }
+  .book { position: relative; width: 330px; height: 470px; transform-style: preserve-3d; transform: rotateY(-28deg) rotateX(6deg); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+  .stage:hover .book { transform: rotateY(-12deg) rotateX(3deg); }
+  .cover, .spine, .pages { position: absolute; }
+  .cover { inset: 0; background: linear-gradient(180deg, #e9eef2 0%, #e9eef2 46%, var(--paper) 46%); box-shadow: 30px 40px 60px -20px rgba(40,30,20,.45), inset 4px 0 8px rgba(0,0,0,.08); overflow: hidden; transform: translateZ(18px); }
+  .cover svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cover .t { position: absolute; left: 26px; right: 26px; top: 30px; }
+  .cover .k { font-family: var(--gothic); font-weight: 700; font-size: 12px; letter-spacing: .3em; color: var(--brick); }
+  .cover .ti { font-family: var(--mincho); font-weight: 800; font-size: 34px; line-height: 1.25; margin-top: 12px; color: var(--ink); }
+  .cover .au { position: absolute; left: 26px; bottom: 24px; font-size: 12px; letter-spacing: .2em; color: var(--paper); }
+  .spine { width: 36px; height: 100%; left: 0; background: linear-gradient(90deg, #8f2f1d, var(--brick)); transform: rotateY(-90deg) translateZ(18px) translateX(-18px); transform-origin: left; }
+  .pages { width: 34px; height: 98%; top: 1%; right: 0; background: repeating-linear-gradient(90deg, #f6f1e7 0 2px, #e2d9c8 2px 3px); transform: rotateY(90deg) translateZ(312px) translateX(17px); }
+  .shadow { width: 360px; height: 30px; margin-top: 30px; background: radial-gradient(ellipse at center, rgba(40,30,20,.35), transparent 70%); filter: blur(4px); }
+
+  /* 正文版式 */
+  .cols { display: grid; grid-template-columns: 200px 1fr; gap: 60px; padding: 90px 0; border-bottom: 1px solid var(--line); }
+  .label { font-family: var(--latin); font-style: italic; font-size: 20px; color: var(--muted); position: sticky; top: 30px; align-self: start; }
+  .label b { display: block; font-family: var(--mincho); font-style: normal; font-size: 28px; color: var(--ink); margin-top: 6px; }
+  .pull { font-family: var(--mincho); font-weight: 700; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.6; margin: 0 0 40px; }
+  .pull .arrow { color: var(--brick); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+  .two h3 { font-family: var(--mincho); font-size: 22px; line-height: 1.6; margin: 0 0 14px; }
+  .two p { color: var(--muted); line-height: 2.05; margin: 0; }
+  .two .n { font-family: var(--latin); font-size: 64px; color: var(--sea); line-height: 1; }
+  .two > div:nth-child(2) .n { color: var(--brick); }
+
+  .toc { counter-reset: none; }
+  .toc .part { display: grid; grid-template-columns: 90px 1fr; gap: 20px; padding: 28px 0; border-top: 1px solid var(--line); }
+  .toc .roman { font-family: var(--latin); font-size: 52px; line-height: 1; color: var(--brick); }
+  .toc h4 { font-family: var(--mincho); font-size: 22px; margin: 0 0 12px; }
+  .toc ol { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 40px; }
+  .toc li { display: flex; gap: 12px; padding: 5px 0; break-inside: avoid; font-size: 15px; }
+  .toc li span { font-family: var(--latin); color: var(--muted); min-width: 24px; }
+  .toc li.soon { color: var(--muted); }
+
+  .quote { padding: 110px 0; text-align: center; border-bottom: 1px solid var(--line); }
+  .quote p { font-family: var(--mincho); font-size: clamp(22px, 2.6vw, 32px); line-height: 2.1; max-width: 860px; margin: 0 auto; }
+  .quote cite { display: block; margin-top: 26px; font-family: var(--latin); font-style: italic; color: var(--muted); }
+
+  .navi { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 90px 0; align-items: center; }
+  .navi h2 { font-family: var(--mincho); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.4; margin: 10px 0 18px; }
+  .navi p { color: var(--muted); line-height: 2; }
+  .card { background: #fffdf8; border: 1px solid var(--line); padding: 28px; box-shadow: 12px 12px 0 var(--paper2); }
+  .card .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
+  .card .row b { font-family: var(--mincho); }
+  footer { padding: 40px 0 70px; font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 900px) {
+    .hero, .cols, .two, .navi { grid-template-columns: 1fr; }
+    .label { position: static; }
+    .toc ol { columns: 1; }
+    nav { display: none; }
+    .book { width: 250px; height: 356px; } .pages { transform: rotateY(90deg) translateZ(232px) translateX(17px); }
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="mast">SAP運用最前線</span><nav><a href="#">本書について</a><a href="#">試し読み</a><a href="#">ギャップ補完ナビ</a><a href="#">著者</a><a href="#">お知らせ</a></nav><span class="issue">日本語 · English · 中文</span></div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="over">The front line of SAP in practice</div>
+      <h1>正本は、<br /><em>コア</em>にある。</h1>
+      <p class="deck">フォームに入力する人も、バッチも、普通の言葉で質問を受けたエージェントも。どの入口から来た意図も、最後はコアの同じ検証にたどり着く。AI時代に SAP S/4HANA の上で作り、つなぎ、動かすための一冊。</p>
+      <div class="cta"><a class="btn" href="#">試し読み</a><a class="link" href="#">目次を見る →</a></div>
+    </div>
+    <div class="stage">
+      <div class="book">
+        <div class="spine"></div>
+        <div class="pages"></div>
+        <div class="cover">
+          <svg viewBox="0 0 330 470" preserveAspectRatio="none">
+            <rect x="0" y="216" width="165" height="254" fill="#1d4e74" />
+            <path d="M0 236 q12 -4 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" stroke="#9cc3df" fill="none" stroke-width="1.2" opacity=".7" />
+            <path d="M0 268 q12 -4 24 0 t24 0 t24 0 t24 0 t24 0 t24 0" stroke="#9cc3df" fill="none" stroke-width="1.2" opacity=".5" />
+            <rect x="165" y="230" width="165" height="240" fill="#a63a24" />
+            <g fill="#8f2f1d">
+              <path d="M180 260 l18 -14 l18 14 z" /><path d="M214 268 l20 -16 l20 16 z" /><path d="M252 258 l18 -14 l18 14 z" /><path d="M286 270 l20 -16 l20 16 z" />
+            </g>
+            <path d="M0 470 L0 300 C 70 290, 120 230, 165 176 C 210 230, 260 290, 330 300 L330 470 Z" fill="#1b1a17" />
+            <circle cx="165" cy="172" r="4" fill="#f4efe6" />
+          </svg>
+          <div class="t"><div class="k">SAP運用最前線</div><div class="ti">正本は<br />コアにある</div></div>
+          <div class="au">著者名</div>
+        </div>
+      </div>
+      <div class="shadow"></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="label">Argument<b>主張</b></div>
+    <div>
+      <p class="pull">意図 <span class="arrow">→</span> 検証 <span class="arrow">→</span> コアの正本。<br />この一本の線が、すべての入口に当てはまる。</p>
+      <div class="two">
+        <div><div class="n">1</div><h3>AIは、製品がすでに持つ機能の使われ方をどう変えるのか。</h3><p>機能そのものは変わらない。変わるのは、誰が操作するか。熟練者の使い方は、AIがたどれる手順に蒸留できる。</p></div>
+        <div><div class="n">2</div><h3>製品が足りないとき、その隙間をどう埋めるべきか。</h3><p>標準の採用から、設定、拡張、隣のアプリケーション、統合、画面の自動化まで。埋められるかではなく、どの段で埋めるべきか。</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="label">Contents<b>目次</b></div>
+    <div class="toc">
+      <div class="part"><div class="roman">I</div><div><h4>基礎：コアを理解する</h4><ol><li><span>11</span>コアと、そこへ至る道</li><li><span>12</span>コアとともに生きる</li><li><span>13</span>主事例：原価センタ</li><li><span>14</span>原則：正本はコアにある</li></ol></div></div>
+      <div class="part"><div class="roman">II</div><div><h4>主チャネルを一歩ずつ</h4><ol><li><span>21</span>インターフェースの発見</li><li><span>22</span>環境の構築</li><li><span>23</span>最初の読み取り</li><li><span>24</span>最初の書き込み</li><li><span>25</span>アプリケーション</li><li><span>26</span>証跡、監査、そして原価センタの先へ</li></ol></div></div>
+      <div class="part"><div class="roman">III</div><div><h4>ガバナンスとマネジメント</h4><ol><li><span>31</span>オーナーシップ、承認、職務分掌</li><li><span>32</span>スコープ、ルール、変更管理</li><li><span>33</span>行動する主体がエージェントであるとき</li><li class="soon"><span>34</span>自分で作っていない製品の要件管理</li><li><span>35</span>人とAIで進めるプロジェクト</li><li><span>36</span>人とAI、ひとつのチーム</li><li><span>37</span>AIとともに作り、動かすための基盤</li></ol></div></div>
+      <div class="part"><div class="roman">IV</div><div><h4>AI時代の新しいチャネル</h4><ol><li><span>41</span>エージェントがコアに触れる前に</li><li><span>42</span>MCP：コアをツールとして公開する</li><li class="soon"><span>43</span>スキル</li><li class="soon"><span>44</span>画面の前のエージェント</li><li class="soon"><span>45</span>イベント、データ</li></ol></div></div>
+    </div>
+  </div>
+
+  <div class="quote">
+    <p>片側には青い海と空、もう片側には赤い煉瓦と古い城壁。<br />尾根に立てば、両側の景色が同時に見える。</p>
+    <cite>— 序章より</cite>
+  </div>
+
+  <div class="navi">
+    <div>
+      <div class="over">Companion tool</div>
+      <h2>ギャップ補完ナビ</h2>
+      <p>現場の「隙間」を TRIZ の矛盾として言い切り、発明原理から埋め方を探す。本書の考え方を、そのまま道具にしました。</p>
+      <div class="cta"><a class="btn" href="#">ナビを開く</a></div>
+    </div>
+    <div class="card">
+      <div class="row"><span>改善</span><b>P04 導入リードタイム</b></div>
+      <div class="row"><span>悪化</span><b>P08 監査可能性</b></div>
+      <div class="row"><span>原理</span><b>10 先取り作用 · 9 先取り反作用</b></div>
+      <div class="row" style="border:none"><span>確信度</span><b>70</b></div>
+    </div>
+  </div>
+</main>
+<footer><div class="wrap">© 著者 · 案B「書」（デザイン方向の比較用モック）</div></footer>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>案C 尾根 · SAP運用最前線</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --washi: #f7f4ee; --sumi: #141414; --gray: #7a766f; --line: #ddd7cc; --shu: #c8321e; --ai: #1f3f5c;
+    --mincho: 'Zen Old Mincho', 'Shippori Mincho B1', serif; --gothic: 'Zen Kaku Gothic New', sans-serif; }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--washi); color: var(--sumi); font-family: var(--gothic); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; mix-blend-mode: multiply; }
+  .mark { display: flex; align-items: center; gap: 12px; font-family: var(--mincho); font-weight: 900; letter-spacing: .2em; }
+  .seal { width: 34px; height: 34px; background: var(--shu); color: #fff; display: grid; place-items: center; font-family: var(--mincho); font-size: 11px; line-height: 1.05; text-align: center; border-radius: 3px; font-weight: 900; }
+  nav { display: flex; gap: 28px; font-size: 13px; letter-spacing: .1em; color: var(--gray); }
+
+  /* 首屏：水墨山脊 + 竖排 */
+  .hero { position: relative; height: 100vh; min-height: 680px; overflow: hidden; }
+  .ink { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .v-title { position: absolute; right: 12vw; top: 14vh; writing-mode: vertical-rl; font-family: var(--mincho); font-weight: 900; font-size: clamp(44px, 6.4vw, 92px); line-height: 1.45; letter-spacing: .14em; }
+  .v-title .shu { color: var(--shu); }
+  .v-sub { position: absolute; right: calc(12vw + clamp(210px, 22vw, 320px)); top: 20vh; writing-mode: vertical-rl; font-family: var(--mincho); font-size: 17px; line-height: 2.2; letter-spacing: .12em; color: var(--gray); max-height: 56vh; }
+  .big-seal { position: absolute; right: 7vw; top: 14vh; width: 66px; height: 66px; background: var(--shu); color: #fff; font-family: var(--mincho); font-weight: 900; font-size: 15px; line-height: 1.1; display: grid; place-items: center; text-align: center; border-radius: 4px; transform: rotate(-4deg); box-shadow: inset 0 0 0 3px var(--washi), inset 0 0 0 5px var(--shu); }
+  .h-lead { position: absolute; left: 8vw; bottom: 12vh; max-width: 440px; }
+  .h-lead .en { font-family: var(--mincho); font-style: italic; letter-spacing: .2em; font-size: 13px; color: var(--gray); }
+  .h-lead p { font-size: 15px; line-height: 2.1; }
+  .cta { display: flex; gap: 18px; margin-top: 24px; align-items: center; }
+  .btn { padding: 13px 26px; background: var(--sumi); color: var(--washi); font-family: var(--mincho); font-weight: 700; letter-spacing: .2em; }
+  .btn.ghost { background: none; color: var(--sumi); border-bottom: 1px solid var(--sumi); padding: 4px 0; }
+  .scroll { position: absolute; left: 50%; bottom: 26px; font-size: 11px; letter-spacing: .4em; color: var(--gray); writing-mode: vertical-rl; }
+
+  section { max-width: 1100px; margin: 0 auto; padding: 140px 40px; display: grid; grid-template-columns: 80px 1fr; gap: 60px; border-top: 1px solid var(--line); }
+  .v-head { writing-mode: vertical-rl; font-family: var(--mincho); font-weight: 900; font-size: 30px; letter-spacing: .3em; justify-self: center; }
+  .v-head small { display: block; font-size: 12px; color: var(--shu); letter-spacing: .4em; margin-left: 10px; }
+
+  .claim { font-family: var(--mincho); font-size: clamp(26px, 3.4vw, 42px); line-height: 1.9; font-weight: 700; margin: 0 0 60px; }
+  .claim .flow { display: flex; gap: 22px; align-items: center; font-size: clamp(18px, 2vw, 24px); color: var(--gray); margin-top: 18px; font-weight: 500; }
+  .claim .flow b { color: var(--sumi); font-weight: 900; } .claim .flow b:last-child { color: var(--shu); }
+  .qs { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+  .q .kanji { font-family: var(--mincho); font-weight: 900; font-size: 88px; line-height: 1; color: transparent; -webkit-text-stroke: 1.2px var(--sumi); }
+  .q h3 { font-family: var(--mincho); font-size: 21px; line-height: 1.8; margin: 16px 0 10px; }
+  .q p { color: var(--gray); line-height: 2.1; font-size: 15px; margin: 0; }
+
+  .gates { display: flex; flex-wrap: wrap; gap: 28px 40px; }
+  .gate { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 110px; text-align: center; font-size: 13px; line-height: 1.6; }
+  .enso { width: 74px; height: 74px; }
+  .gates-note { margin-top: 50px; font-family: var(--mincho); font-size: 20px; line-height: 2; }
+  .gates-note b { color: var(--shu); }
+
+  .toc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-left: 1px solid var(--line); }
+  .col { border-right: 1px solid var(--line); padding: 0 22px 10px; display: flex; flex-direction: row-reverse; gap: 14px; justify-content: flex-end; min-height: 380px; }
+  .col .pn { writing-mode: vertical-rl; font-family: var(--mincho); font-weight: 900; font-size: 22px; letter-spacing: .2em; color: var(--shu); }
+  .col ul { writing-mode: vertical-rl; list-style: none; margin: 0; padding: 0; font-family: var(--mincho); font-size: 15px; line-height: 2.2; letter-spacing: .08em; }
+  .col li.soon { color: var(--gray); }
+
+  .navi { grid-template-columns: 80px 1fr 1fr; }
+  .navi p { line-height: 2.1; color: var(--gray); }
+  .navi h2 { font-family: var(--mincho); font-size: 34px; line-height: 1.6; margin: 0 0 18px; }
+  .slip { background: #fff; border: 1px solid var(--line); padding: 30px; font-family: var(--mincho); position: relative; }
+  .slip::after { content: '検'; position: absolute; right: 18px; bottom: 18px; width: 46px; height: 46px; border: 2px solid var(--shu); color: var(--shu); display: grid; place-items: center; border-radius: 50%; font-weight: 900; transform: rotate(-10deg); opacity: .85; }
+  .slip div { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; font-size: 15px; }
+  .slip span { color: var(--gray); font-family: var(--gothic); font-size: 13px; }
+
+  footer { text-align: center; padding: 60px 0 80px; color: var(--gray); font-size: 12px; letter-spacing: .2em; border-top: 1px solid var(--line); }
+
+  @media (max-width: 900px) {
+    nav { display: none; }
+    .v-title { right: 8vw; top: 12vh; font-size: 46px; }
+    .v-sub { display: none; } .big-seal { right: 4vw; top: 9vh; width: 52px; height: 52px; font-size: 12px; }
+    .h-lead { left: 6vw; right: 6vw; bottom: 8vh; }
+    section, .navi { grid-template-columns: 1fr; padding: 90px 22px; }
+    .v-head { writing-mode: horizontal-tb; justify-self: start; } .v-head small { display: inline; margin-left: 12px; }
+    .qs { grid-template-columns: 1fr; } .toc { grid-template-columns: 1fr 1fr; } .col { min-height: 300px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="mark" href="#"><span class="seal">最前<br />線</span>SAP運用最前線</a>
+  <nav><a href="#">本書</a><a href="#">試し読み</a><a href="#">ナビ</a><a href="#">著者</a><a href="#">日本語 · EN · 中文</a></nav>
+</header>
+
+<div class="hero">
+  <svg class="ink" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <filter id="wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".012 .04" numOctaves="4" seed="7" /><feDisplacementMap in="SourceGraphic" scale="40" /><feGaussianBlur stdDeviation="2.5" /></filter>
+      <filter id="soft"><feGaussianBlur stdDeviation="18" /></filter>
+      <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141414" stop-opacity=".9" /><stop offset="1" stop-color="#141414" stop-opacity=".05" /></linearGradient>
+      <linearGradient id="seaW" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f3f5c" stop-opacity=".55" /><stop offset="1" stop-color="#1f3f5c" stop-opacity="0" /></linearGradient>
+      <linearGradient id="brickW" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#c8321e" stop-opacity=".45" /><stop offset="1" stop-color="#c8321e" stop-opacity="0" /></linearGradient>
+    </defs>
+    <!-- 远山 -->
+    <path d="M0 760 C 200 700, 380 640, 560 660 C 700 676, 760 620, 860 600 C 980 580, 1200 640, 1600 620 L1600 1000 L0 1000 Z" fill="#141414" opacity=".08" filter="url(#wash)" />
+    <!-- 海（左） -->
+    <rect x="0" y="770" width="700" height="230" fill="url(#seaW)" filter="url(#wash)" />
+    <!-- 老城（右）：朱色晕染 -->
+    <rect x="900" y="760" width="700" height="240" fill="url(#brickW)" filter="url(#wash)" />
+    <g fill="#c8321e" opacity=".55" filter="url(#wash)">
+      <path d="M1000 800 l30 -24 l30 24 z" /><path d="M1070 810 l36 -28 l36 28 z" /><path d="M1150 796 l30 -24 l30 24 z" /><path d="M1220 812 l36 -28 l36 28 z" /><path d="M1300 800 l30 -24 l30 24 z" /><path d="M1370 812 l36 -28 l36 28 z" /><path d="M1450 802 l30 -24 l30 24 z" />
+    </g>
+    <!-- 主脊：浓墨一笔 -->
+    <path d="M380 1000 C 520 900, 600 760, 700 610 C 730 566, 760 560, 790 600 C 880 740, 980 900, 1120 1000 Z" fill="url(#fade)" filter="url(#wash)" />
+    <path d="M300 1000 C 470 880, 590 740, 700 600 C 732 560, 758 556, 792 596" fill="none" stroke="#141414" stroke-width="6" stroke-linecap="round" filter="url(#wash)" opacity=".9" />
+    <!-- 人 -->
+    <g fill="#141414"><circle cx="746" cy="548" r="6" /><path d="M740 556 h12 l4 22 h-20 z" /></g>
+    <!-- 月 -->
+    <circle cx="300" cy="260" r="70" fill="#c8321e" opacity=".12" filter="url(#soft)" />
+  </svg>
+
+  <h1 class="v-title">正本は、<br /><span class="shu">コア</span>にある。</h1>
+  <p class="v-sub">AIで、入口は増える。<br />どの入口も、最後は同じ検証へ。</p>
+  <div class="big-seal">運用<br />最前線</div>
+
+  <div class="h-lead">
+    <div class="en">THE FRONT LINE OF SAP IN PRACTICE</div>
+    <p>人も、バッチも、自然言語で動くエージェントも。AI時代に SAP S/4HANA の上で作り、つなぎ、動かすための実践書。</p>
+    <div class="cta"><a class="btn" href="#">試し読み</a><a class="btn ghost" href="#">ギャップ補完ナビ →</a></div>
+  </div>
+  <div class="scroll">SCROLL</div>
+</div>
+
+<section>
+  <h2 class="v-head">主張<small>ARGUMENT</small></h2>
+  <div>
+    <p class="claim">AIは、パッケージ製品に<br />二つの問いを投げかける。
+      <span class="flow"><b>意図</b>―<b>検証</b>―<b>コアの正本</b></span></p>
+    <div class="qs">
+      <div class="q"><div class="kanji">変</div><h3>製品がすでに持つ機能の使われ方は、どう変わるのか。</h3><p>機能は変わらない。変わるのは、誰が操作するか。熟練者の使い方は、AIがたどれる手順に蒸留できる。</p></div>
+      <div class="q"><div class="kanji">補</div><h3>製品が足りないとき、その隙間をどの段で埋めるべきか。</h3><p>標準の採用、設定、拡張、隣のアプリケーション、統合、画面の自動化。埋められるかではなく、どの段で。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 class="v-head">七門<small>WAYS IN</small></h2>
+  <div>
+    <div class="gates">
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -24 10" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round" /></svg>製品本来のUI</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -26 14" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round" /></svg>リリース済み<br />インターフェース</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -22 8" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round" /></svg>イベント・データ</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -27 18" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round" /></svg>ベンダーの<br />エージェント</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -24 12" fill="none" stroke="#1f3f5c" stroke-width="5" stroke-linecap="round" /></svg>MCPツール</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -25 16" fill="none" stroke="#1f3f5c" stroke-width="5" stroke-linecap="round" /></svg>スキル</div>
+      <div class="gate"><svg class="enso" viewBox="0 0 80 80"><path d="M40 8 a32 32 0 1 1 -23 10" fill="none" stroke="#c8321e" stroke-width="5" stroke-linecap="round" /></svg>画面の<br />エージェント</div>
+    </div>
+    <p class="gates-note">入口は七つ。正本は、<b>一つ</b>。</p>
+  </div>
+</section>
+
+<section>
+  <h2 class="v-head">目次<small>CONTENTS</small></h2>
+  <div class="toc">
+    <div class="col"><div class="pn">第一部 基礎</div><ul><li>コアと、そこへ至る道</li><li>コアとともに生きる</li><li>主事例：原価センタ</li><li>原則：正本はコアにある</li></ul></div>
+    <div class="col"><div class="pn">第二部 主チャネル</div><ul><li>インターフェースの発見</li><li>環境の構築</li><li>最初の読み取り</li><li>最初の書き込み</li><li>アプリケーション</li><li>証跡、監査</li></ul></div>
+    <div class="col"><div class="pn">第三部 統制</div><ul><li>承認、職務分掌</li><li>変更管理</li><li>主体がエージェント</li><li class="soon">要件管理</li><li>人とAIのプロジェクト</li><li>ひとつのチーム</li><li>作り、動かす基盤</li></ul></div>
+    <div class="col"><div class="pn">第四部 新チャネル</div><ul><li>エージェントの前に</li><li>MCP</li><li class="soon">スキル</li><li class="soon">画面のエージェント</li><li class="soon">イベント、データ</li></ul></div>
+  </div>
+</section>
+
+<section class="navi">
+  <h2 class="v-head">道具<small>TOOL</small></h2>
+  <div>
+    <h2>ギャップ補完ナビ</h2>
+    <p>現場の「隙間」を TRIZ の矛盾として言い切り、発明原理から埋め方を探す。AIは答えを出さない。問いを立てる。</p>
+    <div class="cta"><a class="btn" href="#">ナビを開く</a></div>
+  </div>
+  <div class="slip">
+    <div>P04 導入リードタイム<span>改善</span></div>
+    <div>P08 監査可能性<span>悪化</span></div>
+    <div>十 先取り作用 · 九 先取り反作用<span>原理</span></div>
+    <div style="border:none">確信度 七〇<span>自己申告</span></div>
+  </div>
+</section>
+
+<footer>© 著者 · 案C「尾根」（デザイン方向の比較用モック）</footer>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>案A 最前線 · SAP運用最前線</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05070b; --bg2: #0a0e15; --fg: #eef2f7; --muted: #8b97a8; --line: rgba(255,255,255,.08);
+    --sea: #4aa3ff; --brick: #ff6b4a; --mint: #39e0b0; --gold: #ffc56b;
+    --sans: 'Inter', 'Zen Kaku Gothic New', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* 背景：网格 + 两团光 */
+  .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(600px 400px at 15% 10%, rgba(74,163,255,.18), transparent 70%),
+      radial-gradient(700px 500px at 90% 30%, rgba(255,107,74,.14), transparent 70%),
+      radial-gradient(900px 600px at 50% 120%, rgba(57,224,176,.10), transparent 70%),
+      var(--bg); }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px; mask-image: radial-gradient(ellipse at 50% 20%, #000 20%, transparent 75%); }
+
+  /* 导航 */
+  header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(5,7,11,.6); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; gap: 28px; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .04em; }
+  .logo svg { width: 26px; height: 26px; }
+  nav { display: flex; gap: 22px; font-size: 14px; color: var(--muted); flex: 1; }
+  nav a:hover { color: var(--fg); }
+  .lang { font-size: 13px; color: var(--muted); display: flex; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; border: 1px solid var(--line); background: rgba(255,255,255,.04); transition: .2s; }
+  .btn:hover { background: rgba(255,255,255,.08); transform: translateY(-1px); }
+  .btn.primary { background: linear-gradient(135deg, var(--sea), #7b8cff); border: none; color: #fff; box-shadow: 0 10px 40px -10px rgba(74,163,255,.7); }
+  .btn.sm { padding: 8px 14px; font-size: 13px; border-radius: 10px; }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; padding: 72px 0 40px; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: 13px; color: var(--muted); }
+  .pill b { background: linear-gradient(135deg, var(--brick), var(--gold)); color: #1a0b05; padding: 4px 10px; border-radius: 999px; font-weight: 800; letter-spacing: .08em; }
+  h1 { font-family: 'Zen Kaku Gothic New', var(--sans); font-weight: 900; font-size: clamp(34px, 4.6vw, 68px); line-height: 1.15; letter-spacing: -.01em; margin: 22px 0 22px; }
+  h1 .g { background: linear-gradient(100deg, var(--sea) 0%, var(--mint) 45%, var(--gold) 75%, var(--brick) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { font-size: 18px; line-height: 1.8; color: var(--muted); max-width: 560px; }
+  .cta { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  .meta { margin-top: 28px; font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+  .meta span::before { content: '●'; color: var(--mint); margin-right: 6px; }
+
+  /* 核心图 */
+  .core-wrap { position: relative; aspect-ratio: 1; }
+  .core-wrap svg { width: 100%; height: 100%; overflow: visible; }
+  .flow { stroke-dasharray: 4 10; animation: flow 1.6s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -28; } }
+  .ring { transform-origin: 300px 300px; animation: spin 40s linear infinite; }
+  .ring2 { transform-origin: 300px 300px; animation: spin 26s linear infinite reverse; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pulse { transform-origin: 300px 300px; animation: pulse 2.8s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.85); opacity: .7 } 100% { transform: scale(1.6); opacity: 0 } }
+  .node rect { fill: rgba(12,17,26,.92); stroke: rgba(255,255,255,.14); }
+  .node text { fill: var(--fg); font-size: 13px; font-family: 'Zen Kaku Gothic New', var(--sans); font-weight: 500; }
+  .node .tag { fill: var(--muted); font-size: 10px; font-family: var(--mono); }
+  .packet { animation: travel 2.4s ease-in infinite; }
+
+  /* 数字条 */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; margin: 40px 0 120px; background: rgba(255,255,255,.02); }
+  .stat { padding: 28px; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: none; }
+  .stat .n { font-size: 44px; font-weight: 800; letter-spacing: -.02em; }
+  .stat .l { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  section { margin: 0 0 140px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .18em; color: var(--mint); text-transform: uppercase; }
+  h2 { font-family: 'Zen Kaku Gothic New', var(--sans); font-weight: 900; font-size: clamp(32px, 4vw, 52px); line-height: 1.2; margin: 14px 0 18px; letter-spacing: -.01em; }
+  .lede { color: var(--muted); font-size: 17px; line-height: 1.85; max-width: 680px; }
+
+  /* Bento */
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 40px; }
+  .card { position: relative; border: 1px solid var(--line); border-radius: 22px; padding: 30px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)); overflow: hidden; }
+  .card::after { content: ''; position: absolute; inset: -1px; border-radius: 22px; padding: 1px; background: linear-gradient(140deg, rgba(255,255,255,.18), transparent 40%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+  .c3 { grid-column: span 3; } .c2 { grid-column: span 2; } .c4 { grid-column: span 4; } .c6 { grid-column: span 6; }
+  .card h3 { font-size: 22px; line-height: 1.45; margin: 14px 0 10px; font-family: 'Zen Kaku Gothic New', var(--sans); font-weight: 700; }
+  .card p { color: var(--muted); line-height: 1.85; margin: 0; }
+  .num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .q1 { background: radial-gradient(500px 300px at 0% 0%, rgba(74,163,255,.18), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)); }
+  .q2 { background: radial-gradient(500px 300px at 100% 0%, rgba(255,107,74,.18), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)); }
+
+  /* 阶梯 */
+  .ladder { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
+  .rung { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+  .rung i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--mint), var(--sea)); }
+  .rung span { color: var(--muted); white-space: nowrap; }
+
+  /* 终端 */
+  .term { font-family: var(--mono); font-size: 13.5px; line-height: 2; background: #070a10; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-top: 20px; }
+  .term .dots { display: flex; gap: 6px; margin-bottom: 10px; } .term .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2a3140; }
+  .ok { color: var(--mint); } .dim { color: var(--muted); } .warn { color: var(--gold); }
+
+  /* 部 */
+  .parts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+  .part { border-top: 2px solid var(--line); padding-top: 22px; transition: .3s; }
+  .part:hover { border-color: var(--sea); }
+  .part .roman { font-size: 54px; font-weight: 800; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.35); line-height: 1; }
+  .part h4 { font-size: 18px; margin: 16px 0 8px; font-family: 'Zen Kaku Gothic New', var(--sans); }
+  .part p { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 0; }
+  .part .chs { margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  /* 导航预览 */
+  .app { display: grid; grid-template-columns: .9fr 1.1fr; gap: 40px; align-items: center; }
+  .mock { border-radius: 18px; border: 1px solid var(--line); background: #0b1018; padding: 22px; box-shadow: 0 40px 120px -30px rgba(74,163,255,.35); transform: perspective(1400px) rotateY(-8deg) rotateX(4deg); }
+  .steps { display: flex; gap: 6px; margin-bottom: 18px; } .steps i { flex: 1; height: 4px; border-radius: 2px; background: #1f2633; } .steps i.on { background: var(--sea); }
+  .sel { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; font-size: 14px; }
+  .sel div { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: #0e141e; }
+  .sel small { display: block; color: var(--muted); font-size: 11px; font-family: var(--mono); margin-bottom: 4px; }
+  .cands { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+  .cand { border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 13px; color: var(--muted); }
+  .cand b { display: block; color: var(--fg); margin-bottom: 4px; }
+  .cand.on { border-color: var(--sea); box-shadow: inset 0 0 0 1px var(--sea); background: rgba(74,163,255,.06); }
+
+  /* 山脊收尾 */
+  .ridge { position: relative; text-align: center; padding: 80px 0 0; }
+  .ridge svg { width: 100%; height: 200px; display: block; margin-top: 30px; }
+  .ridge blockquote { font-size: clamp(20px, 2.4vw, 28px); line-height: 1.8; max-width: 760px; margin: 0 auto; font-family: 'Zen Kaku Gothic New'; font-weight: 500; }
+  footer { border-top: 1px solid var(--line); padding: 30px 0 60px; color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 900px) {
+    .hero, .app { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(2) { border-right: none; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .bento { grid-template-columns: 1fr; } .c2, .c3, .c4, .c6 { grid-column: span 1; }
+    .parts { grid-template-columns: 1fr 1fr; }
+    nav { display: none; }
+    .mock { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="bg"><div class="grid"></div></div>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#">
+      <svg viewBox="0 0 26 26"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#4aa3ff"/><stop offset="1" stop-color="#ff6b4a"/></linearGradient></defs><path d="M1 20 C7 16 10 8 13 4 C16 8 19 16 25 20" fill="none" stroke="url(#lg)" stroke-width="2.6" stroke-linecap="round"/><circle cx="13" cy="4" r="2.4" fill="#fff"/></svg>
+      SAP運用最前線
+    </a>
+    <nav><a href="#">本書について</a><a href="#">試し読み</a><a href="#">ギャップ補完ナビ</a><a href="#">著者</a><a href="#">お知らせ</a></nav>
+    <div class="lang"><b style="color:#fff">日本語</b><span>English</span><span>中文</span></div>
+    <a class="btn sm primary" href="#">予約する</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <span class="pill"><b>SAP運用最前線</b> AI時代のコアシステム実践書 · 2027</span>
+      <h1><span style="white-space:nowrap">正本はコアにある。</span><br /><span class="g" style="white-space:nowrap">AIで、入口は増える。</span></h1>
+      <p class="sub">人も、バッチも、自然言語で動くエージェントも。どの入口から来た意図も、最後はコアの同じ検証にたどり着く。SAP S/4HANA の上で作り、つなぎ、動かすための設計図。</p>
+      <div class="cta">
+        <a class="btn primary" href="#">試し読みする →</a>
+        <a class="btn" href="#">ギャップ補完ナビを使う</a>
+      </div>
+      <div class="meta"><span>S/4HANA Cloud Public Edition で検証</span><span>実コードで完走</span><span>MCP · Skills · Agents</span></div>
+    </div>
+
+    <div class="core-wrap" aria-label="七つの入口からの意図が、検証を経てコアに届く図">
+      <svg viewBox="0 0 600 600">
+        <defs>
+          <radialGradient id="coreG" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd38a"/><stop offset=".45" stop-color="#ff6b4a"/><stop offset="1" stop-color="#ff6b4a" stop-opacity="0"/></radialGradient>
+          <linearGradient id="lineG" x1="0" x2="1"><stop offset="0" stop-color="#4aa3ff" stop-opacity=".1"/><stop offset="1" stop-color="#39e0b0"/></linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- 检证环 -->
+        <circle cx="300" cy="300" r="150" fill="none" stroke="rgba(255,255,255,.06)" />
+        <g class="ring"><circle cx="300" cy="300" r="118" fill="none" stroke="#39e0b0" stroke-opacity=".55" stroke-dasharray="2 8" /></g>
+        <g class="ring2"><circle cx="300" cy="300" r="96" fill="none" stroke="#4aa3ff" stroke-opacity=".5" stroke-dasharray="40 14" /></g>
+        <text x="300" y="168" text-anchor="middle" fill="#39e0b0" font-family="JetBrains Mono" font-size="11" letter-spacing="3">VALIDATION</text>
+        <!-- 数据流 -->
+        <g fill="none" stroke="url(#lineG)" stroke-width="1.6">
+          <path class="flow" d="M60 80 Q180 140 230 230" /><path class="flow" d="M300 20 L300 200" /><path class="flow" d="M540 80 Q420 140 370 230" />
+          <path class="flow" d="M30 300 L200 300" /><path class="flow" d="M570 300 L400 300" />
+          <path class="flow" d="M70 520 Q180 460 230 370" /><path class="flow" d="M530 520 Q420 460 370 370" />
+        </g>
+        <!-- 核心 -->
+        <circle class="pulse" cx="300" cy="300" r="60" fill="none" stroke="#ff6b4a" stroke-width="2" />
+        <circle cx="300" cy="300" r="90" fill="url(#coreG)" opacity=".55" filter="url(#glow)" />
+        <circle cx="300" cy="300" r="56" fill="#0b0f16" stroke="#ff6b4a" stroke-width="1.5" />
+        <text x="300" y="296" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="800" font-size="22" letter-spacing="2">CORE</text>
+        <text x="300" y="318" text-anchor="middle" fill="#ffb39f" font-family="JetBrains Mono" font-size="11">正本 · S/4HANA</text>
+        <!-- 入口 -->
+        <g class="node"><rect x="0" y="52" width="122" height="46" rx="10"/><text x="14" y="72">製品本来のUI</text><text class="tag" x="14" y="88">HUMAN</text></g>
+        <g class="node"><rect x="238" y="0" width="124" height="46" rx="10"/><text x="252" y="20">リリース済みAPI</text><text class="tag" x="252" y="36">CONTRACT</text></g>
+        <g class="node"><rect x="478" y="52" width="122" height="46" rx="10"/><text x="492" y="72">イベント・データ</text><text class="tag" x="492" y="88">STREAM</text></g>
+        <g class="node"><rect x="-30" y="277" width="118" height="46" rx="10"/><text x="-16" y="297">ベンダーAI</text><text class="tag" x="-16" y="313">VENDOR</text></g>
+        <g class="node"><rect x="512" y="277" width="118" height="46" rx="10"/><text x="526" y="297">MCPツール</text><text class="tag" x="526" y="313">TOOLS</text></g>
+        <g class="node"><rect x="10" y="500" width="122" height="46" rx="10"/><text x="24" y="520">スキル</text><text class="tag" x="24" y="536">KNOW-HOW</text></g>
+        <g class="node"><rect x="458" y="500" width="142" height="46" rx="10"/><text x="472" y="520">画面のエージェント</text><text class="tag" x="472" y="536">BROWSER / GUI</text></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">4<span style="font-size:20px;color:var(--muted)"> 部</span></div><div class="l">基礎 → 実装 → 統制 → AIチャネル</div></div>
+    <div class="stat"><div class="n">22<span style="font-size:20px;color:var(--muted)"> 章</span></div><div class="l">概念・アーキテクチャ・実コード</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">コアへの入口を一冊で比較</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">本番で使える設計図</div></div>
+  </div>
+
+  <section>
+    <div class="eyebrow">Two questions</div>
+    <h2>AIは、パッケージ製品に<br />二つの問いを投げかける。</h2>
+    <div class="bento">
+      <div class="card c3 q1">
+        <span class="num">01 · 使い方が変わる</span>
+        <h3>製品がすでに持つ機能の「使われ方」は、どう変わるのか。</h3>
+        <p>機能は変わらない。変わるのは、誰が操作するか。熟練者の画面のたどり方、確認の勘所、例外の知識は、AIがたどれる手順に蒸留できる。</p>
+      </div>
+      <div class="card c3 q2">
+        <span class="num">02 · 隙間を埋める</span>
+        <h3>製品が足りないとき、その隙間をどの段で埋めるべきか。</h3>
+        <p>標準の採用、設定、拡張、隣のアプリケーション、統合、画面の自動化。AIで下の段が安くなった今、問いは「埋められるか」ではない。</p>
+        <div class="ladder">
+          <div class="rung"><i style="width:30%"></i><span>標準プロセスを採用</span></div>
+          <div class="rung"><i style="width:45%"></i><span>設定・キーユーザー拡張</span></div>
+          <div class="rung"><i style="width:62%"></i><span>サイドバイサイド</span></div>
+          <div class="rung"><i style="width:78%"></i><span>統合・MCP</span></div>
+          <div class="rung"><i style="width:95%;background:linear-gradient(90deg,#ffc56b,#ff6b4a)"></i><span>画面の自動化</span></div>
+        </div>
+      </div>
+      <div class="card c4">
+        <span class="num">03 · 本書で作るもの</span>
+        <h3>プロトタイプではない。本番で使える設計図。</h3>
+        <p>原価センタのマスタを、依頼の受付からコアへの書き込み、証跡まで。</p>
+        <div class="term">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div><span class="dim">$</span> side import cost_centers.xlsx</div>
+          <div><span class="ok">✓</span> 受付 <span class="dim">· 128 行（CSV / XLSX / Webフォーム）</span></div>
+          <div><span class="ok">✓</span> 検証 <span class="dim">· ルールカタログ + SAP ドライラン</span></div>
+          <div><span class="warn">◐</span> 承認 <span class="dim">· 職務分掌に沿って 2 段階</span></div>
+          <div><span class="ok">✓</span> 書き込み <span class="dim">· リリース済み API · 明示的コミット</span></div>
+          <div><span class="ok">✓</span> 証跡 <span class="dim">· 行・バッチ・オブジェクト単位で記録</span></div>
+        </div>
+      </div>
+      <div class="card c2">
+        <span class="num">04 · 統制</span>
+        <h3>エージェントが<br />行動する主体になるとき。</h3>
+        <p>承認、職務分掌、変更管理。人とAIがひとつのチームで進めるプロジェクトの運営まで。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Contents</div>
+    <h2>四部、二十二章。</h2>
+    <p class="lede">概念から入り、アーキテクチャを経て、実コードで閉じる。学習目標も練習問題もない。順番そのものが教える。</p>
+    <div class="parts">
+      <a class="part" href="#"><div class="roman">I</div><h4>基礎：コアを理解する</h4><p>コアとは何か。入口の種類と、全書を貫く原則。</p><div class="chs">CH 11–14</div></a>
+      <a class="part" href="#"><div class="roman">II</div><h4>主チャネルを一歩ずつ</h4><p>リリース済みAPIで読み、書き、証跡を残す。</p><div class="chs">CH 21–26</div></a>
+      <a class="part" href="#"><div class="roman">III</div><h4>ガバナンスとマネジメント</h4><p>承認、変更管理、人とAIのチーム運営。</p><div class="chs">CH 31–37</div></a>
+      <a class="part" href="#"><div class="roman">IV</div><h4>AI時代の新しいチャネル</h4><p>MCP、スキル、画面のエージェント、イベント。</p><div class="chs">CH 41–45</div></a>
+    </div>
+  </section>
+
+  <section class="app">
+    <div>
+      <div class="eyebrow">Interactive</div>
+      <h2>読む前に、<br />手を動かす。</h2>
+      <p class="lede">あなたの現場の「隙間」を TRIZ の矛盾として言い切り、発明原理から埋め方を探す。本書の考え方を、そのまま道具にした。AIは答えを出さない。問いを立てる。</p>
+      <div class="cta"><a class="btn primary" href="#">ギャップ補完ナビを開く →</a></div>
+    </div>
+    <div class="mock">
+      <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      <div class="sel"><div><small>IMPROVE</small>P04 導入リードタイム</div><span style="color:var(--muted)">×</span><div><small>WORSEN</small>P08 監査可能性</div></div>
+      <div class="cands">
+        <div class="cand on"><b>10 先取り作用</b>承認を先に取っておく</div>
+        <div class="cand"><b>32 色の変化</b>変更区分を赤・黄・緑で可視化</div>
+        <div class="cand on"><b>9 先取り反作用</b>書き込み前にドライラン</div>
+        <div class="cand"><b>11 事前保護</b>ロールバック手順を先に用意</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ridge">
+    <div class="eyebrow">The ridge</div>
+    <blockquote>片側には青い海と空、もう片側には赤い煉瓦と古い城壁。<br />尾根に立てば、両側の景色が同時に見える。</blockquote>
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#4aa3ff"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#ff6b4a"/></linearGradient></defs>
+      <path d="M0 190 C 300 180, 480 120, 600 30 C 720 120, 900 180, 1200 190" fill="none" stroke="url(#rg)" stroke-width="2" />
+      <circle cx="600" cy="30" r="5" fill="#fff" />
+    </svg>
+  </section>
+</main>
+
+<footer><div class="wrap">© 著者 · 案A「最前線」（デザイン方向の比較用モック）</div></footer>
+</body>
+</html>
