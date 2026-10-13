@@ -1,0 +1,28 @@
+---
+// 首页正文。三个语言的页面都渲染这个组件，只换 locale。
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { t, type Locale } from '../i18n/ui';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<section class="hero">
+  <p class="eyebrow">{t(locale, 'home.comingSoon')}</p>
+  <h1>{t(locale, 'site.title')}</h1>
+  <p class="tagline">{t(locale, 'site.tagline')}</p>
+  <p class="actions">
+    <a class="button" href={getRelativeLocaleUrl(locale, 'app')}>{t(locale, 'home.tryApp')}</a>
+    <span class="button disabled" aria-disabled="true">{t(locale, 'home.buy')}</span>
+  </p>
+</section>
+
+<style>
+  .hero { padding: 3rem 0; }
+  .eyebrow { color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.2em 0; }
+  .tagline { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
+  .actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+  .button { display: inline-block; padding: 0.7rem 1.4rem; border-radius: 0.4rem; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; }
+  .button.disabled { background: var(--line); color: var(--muted); }
+</style>

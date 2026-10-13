@@ -1,0 +1,9 @@
+---
+// 根路径直接渲染日文首页（主版），不做重定向。
+import Base from '../layouts/Base.astro';
+import Home from '../components/Home.astro';
+---
+
+<Base locale="ja" path="">
+  <Home locale="ja" />
+</Base>

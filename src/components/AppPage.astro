@@ -1,0 +1,25 @@
+---
+// 应用页正文：标题、说明与 Vue 五步导航岛屿。
+import { t, type Locale } from '../i18n/ui';
+import Navigator from './app/Navigator.vue';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+// 课程模式（APP_MODE=course）下显示振り返り提示与导出；公开环境关闭。
+// 页面是预渲染的，构建期没有 Workers 运行时，所以动态读取并在失败时取默认值。
+let appMode = 'course';
+try {
+  const { env } = await import('cloudflare:workers');
+  appMode = (env as { APP_MODE?: string }).APP_MODE ?? appMode;
+} catch {
+  /* prerender: no runtime */
+}
+---
+
+<h1>{t(locale, 'app.title')}</h1>
+<p class="lead">{t(locale, 'app.lead')}</p>
+<Navigator client:load locale={locale} courseMode={appMode === 'course'} />
+
+<style>
+  .lead { color: var(--muted); max-width: 44rem; }
+</style>

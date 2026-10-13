@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';
+import AppPage from '../../components/AppPage.astro';
+import { t } from '../../i18n/ui';
+---
+
+<Base locale="zh" path="app" title={t('zh', 'app.title')} description={t('zh', 'app.lead')}>
+  <AppPage locale="zh" />
+</Base>

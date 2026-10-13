@@ -1,0 +1,17 @@
+---
+// 隐私政策占位。正式文本需覆盖：收集项（邮箱、语言偏好、匿名事件日志）、目的、保存期（日志 90 天）、
+// 委托先（Cloudflare、邮件服务）、联络方式。依据日本《個人情報保護法》，三语各一份，由作者审定。
+import type { Locale } from '../i18n/ui';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+
+const text = {
+  ja: { title: 'プライバシーポリシー', body: '本ページは準備中です。公開前に、取得する情報（メールアドレス、言語設定、匿名の操作イベント）、利用目的、保存期間、委託先、連絡先を記載します。' },
+  en: { title: 'Privacy policy', body: 'This page is in preparation. Before launch it will state what we collect (email address, language preference, anonymous usage events), the purposes, retention periods, processors, and how to contact us.' },
+  zh: { title: '隐私政策', body: '本页尚在准备。公开前将写明收集项（邮箱、语言偏好、匿名操作事件）、用途、保存期限、委托方与联系方式。' },
+} as const;
+---
+
+<h1>{text[locale].title}</h1>
+<p>{text[locale].body}</p>

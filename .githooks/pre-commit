@@ -1,0 +1,33 @@
+#!/bin/sh
+# 提交前检查：身份、密钥文件、凭据形状。安装：git config core.hooksPath .githooks
+set -e
+
+# 1. 身份：只允许个人 noreply 地址（本仓库公开）
+expected="311232893+beanocle@users.noreply.github.com"
+for ident in "$(git var GIT_AUTHOR_IDENT)" "$(git var GIT_COMMITTER_IDENT)"; do
+  email=$(printf '%s' "$ident" | sed -n 's/.*<\(.*\)>.*/\1/p')
+  if [ "$email" != "$expected" ]; then
+    echo "pre-commit: refusing to commit with identity <$email>" >&2
+    echo "pre-commit: run  git config user.email $expected  (no --global) and retry" >&2
+    exit 1
+  fi
+done
+
+# 2. 密钥文件绝不入库
+if git diff --cached --name-only | grep -Ex '(\.dev\.vars|\.env|\.env\..*|.*\.pem|.*\.key|CLAUDE\.local\.md|dev\.local\..*|tools/secrets\.local\.txt)' >/dev/null; then
+  echo "pre-commit: a secrets file is staged (.dev.vars / .env / *.pem / *.key). Unstage it." >&2
+  exit 1
+fi
+
+# 3. 凭据与内网信息的形状扫描（只扫暂存区）
+PY=""
+for cand in python python3 py; do
+  if command -v "$cand" >/dev/null 2>&1 && "$cand" -c "import sys" >/dev/null 2>&1; then
+    PY="$cand"; break
+  fi
+done
+if [ -z "$PY" ]; then
+  echo "pre-commit: python not found; refusing to commit without the secrets scan" >&2
+  exit 1
+fi
+PYTHONIOENCODING=utf-8 "$PY" tools/check_secrets.py --staged

@@ -1,0 +1,45 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"compatibility_date": "2026-10-06",
+	"compatibility_flags": ["global_fetch_strictly_public"],
+	"name": "book-site",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	},
+	// 非密钥的变量。密钥（GEMINI_API_KEY 等）只走 `wrangler secret put`，本地走 .dev.vars。
+	// 额度保护：免费额度很小，默认值偏保守；课程密钥到手后再按上限调整。
+	"vars": {
+		"APP_MODE": "course",
+		"PROMPT_VERSION": "0",
+		"GEMINI_MODEL": "gemini-2.5-flash",
+		"MAX_CALLS_PER_SESSION": "30",
+		"MAX_CALLS_PER_DAY": "200"
+	},
+	// 学习日志。本地开发用 wrangler 的本地 D1（.wrangler/，已忽略）；线上 database_id 在建库后填入。
+	// 建库：npx wrangler d1 create book-site-events ；迁移：npx wrangler d1 migrations apply book-site-events [--local|--remote]
+	"d1_databases": [
+		{ "binding": "DB", "database_name": "book-site-events", "database_id": "f5b8fc72-6f7d-4670-b588-97c2173d9177", "migrations_dir": "migrations" }
+	],
+	// 一个账号、两个环境：course = 课程期间（workers.dev，noindex，不关联任何大学账号或邮箱），production = 书名与出版日期定后公开。
+	"env": {
+		"course": {
+			"name": "book-site-course",
+			"vars": { "APP_MODE": "course", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-2.5-flash", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "200" },
+			"d1_databases": [
+				{ "binding": "DB", "database_name": "book-site-events", "database_id": "f5b8fc72-6f7d-4670-b588-97c2173d9177", "migrations_dir": "migrations" }
+			]
+		},
+		"production": {
+			"name": "book-site",
+			"vars": { "APP_MODE": "production", "PROMPT_VERSION": "0", "GEMINI_MODEL": "gemini-2.5-flash", "MAX_CALLS_PER_SESSION": "30", "MAX_CALLS_PER_DAY": "500" },
+			"d1_databases": [
+				{ "binding": "DB", "database_name": "book-site-events-prod", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+			]
+		}
+	}
+}

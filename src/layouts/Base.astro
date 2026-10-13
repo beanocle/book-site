@@ -1,0 +1,89 @@
+---
+// 全站基础布局：语言属性、hreflang、导航、语言切换、页脚。
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { locales, localeTags, t, type Locale } from '../i18n/ui';
+import LangSwitch from '../components/LangSwitch.astro';
+
+interface Props {
+  locale: Locale;
+  /** 不含语言前缀的页面路径，如 "" 或 "app"。用于 hreflang 与语言切换。 */
+  path: string;
+  title?: string;
+  description?: string;
+}
+
+const { locale, path, title, description } = Astro.props;
+const siteTitle = t(locale, 'site.title');
+const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
+const nav: Array<{ key: Parameters<typeof t>[1]; path: string }> = [
+  { key: 'nav.home', path: '' },
+  { key: 'nav.app', path: 'app' },
+];
+---
+
+<!doctype html>
+<html lang={localeTags[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {
+      locales.map((l) => (
+        <link rel="alternate" hreflang={localeTags[l]} href={new URL(getRelativeLocaleUrl(l, path), Astro.site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(getRelativeLocaleUrl('ja', path), Astro.site)} />
+    <!-- 书名与出版日期定前不索引 -->
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={getRelativeLocaleUrl(locale, '')}>{siteTitle}</a>
+      <nav>
+        {nav.map((item) => <a href={getRelativeLocaleUrl(locale, item.path)}>{t(locale, item.key)}</a>)}
+      </nav>
+      <LangSwitch current={locale} path={path} />
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <a href={getRelativeLocaleUrl(locale, 'privacy')}>{t(locale, 'footer.privacy')}</a>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --fg: #1f2933;
+    --bg: #ffffff;
+    --muted: #52606d;
+    --accent: #0b6e4f; /* 山脊：海与旧城之间的绿线，正式配色待封面定 */
+    --line: #d9e2ec;
+    --maxw: 56rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e4e7eb;
+      --bg: #121619;
+      --muted: #9aa5b1;
+      --accent: #5bc49a;
+      --line: #323f4b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans SC', sans-serif; }
+  body { margin: 0; color: var(--fg); background: var(--bg); line-height: 1.7; }
+  a { color: var(--accent); }
+  main { max-width: var(--maxw); margin: 0 auto; padding: 2rem 1rem; }
+  .site-header, .site-footer { max-width: var(--maxw); margin: 0 auto; padding: 1rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+  .site-header { border-bottom: 1px solid var(--line); }
+  .site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+  .brand { font-weight: 700; color: var(--fg); text-decoration: none; }
+  .site-header nav { display: flex; gap: 1rem; flex: 1; }
+  .site-header nav a { color: var(--fg); text-decoration: none; }
+  .site-header nav a:hover { color: var(--accent); }
+</style>

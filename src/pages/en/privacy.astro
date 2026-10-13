@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';
+import Privacy from '../../components/Privacy.astro';
+import { t } from '../../i18n/ui';
+---
+
+<Base locale="en" path="privacy" title={t('en', 'footer.privacy')}>
+  <Privacy locale="en" />
+</Base>
