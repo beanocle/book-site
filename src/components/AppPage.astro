@@ -2,9 +2,12 @@
 // 应用页正文：标题、说明与 Vue 五步导航岛屿。
 import { t, type Locale } from '../i18n/ui';
 import Navigator from './app/Navigator.vue';
+import { loadTrizData } from '../lib/triz-data';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
+// 参数表、原理表、矩阵在构建时从 src/triz/ 解析，作为 props 交给导航（目前只有日文版）
+const triz = loadTrizData();
 // 课程模式（APP_MODE=course）下显示振り返り提示与导出；公开环境关闭。
 // 页面是预渲染的，构建期没有 Workers 运行时，所以动态读取并在失败时取默认值。
 let appMode = 'course';
@@ -18,7 +21,7 @@ try {
 
 <h1>{t(locale, 'app.title')}</h1>
 <p class="lead">{t(locale, 'app.lead')}</p>
-<Navigator client:load locale={locale} courseMode={appMode === 'course'} />
+<Navigator client:load locale={locale} courseMode={appMode === 'course'} triz={triz} />
 
 <style>
   .lead { color: var(--muted); max-width: 44rem; }
