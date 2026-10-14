@@ -62,7 +62,7 @@ export interface Part { volume: 1 | 2; title: T; summary: T; chapters: Chapter[]
 
 const ch = (no: string, ja: string, en: string, zh: string, built = true, slug?: string): Chapter => ({ no, title: { ja, en, zh }, built, slug });
 
-// 章号为书稿的文件号（2026-10-14 起的上下两卷结构），读者章号在排版时另定。
+// no 是书稿的文件号，只用于和书稿对照，网站上不显示：读者章号在排版时连续编排，待写章完成前还会变（BOOK 会话 2026-10-14）。
 export const intro: Chapter = ch('00', '序章', 'Book Introduction', '序章', true, 'preface');
 
 export const volumes: Record<1 | 2, Volume> = {

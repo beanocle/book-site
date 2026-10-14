@@ -33,7 +33,6 @@ const s = {
   {s.zhNote && <p class="muted">{s.zhNote}</p>}
   <ol class="toc">
     <li class="chap">
-      <span class="no">—</span>
       <span>{intro.title[locale]}</span>
       <a class="tag" href={u('read/' + intro.slug)}>{s.sample}</a>
     </li>
@@ -52,7 +51,6 @@ const s = {
       <ol class="toc">
         {p.chapters.map((c) => (
           <li class:list={['chap', { planned: !c.built }]}>
-            <span class="no">{c.no}</span>
             <span>{c.title[locale]}</span>
             {c.slug && <a class="tag" href={u('read/' + c.slug)}>{s.sample}</a>}
             {!c.built && <span class="tag dim">{s.planned}</span>}
@@ -90,7 +88,6 @@ const s = {
   .qs span { color: var(--muted); }
   .toc { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
   .chap { display: flex; gap: 0.9rem; align-items: baseline; padding: 0.55rem 0.2rem; border-bottom: 1px solid var(--line); }
-  .chap .no { font-family: var(--serif); color: var(--accent); min-width: 2rem; }
   .chap.planned { color: var(--muted); }
   .tag { margin-left: auto; font-size: 0.75rem; padding: 0.1rem 0.6rem; border-radius: 999px; border: 1px solid var(--accent); text-decoration: none; white-space: nowrap; }
   .tag.dim { border-color: var(--line); color: var(--muted); }
