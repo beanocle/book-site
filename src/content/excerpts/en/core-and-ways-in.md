@@ -1,7 +1,7 @@
 ---
 title: "The Core and the Ways In"
 lang: en
-slug: ch11
+slug: core-and-ways-in
 status: draft
 excerpt: true
 imported: 2026-10-14

@@ -2,7 +2,7 @@
 // 「关于本书」：定位、两个问题、目录（四部）、读者、本书要做的东西。
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import type { Locale } from '../i18n/ui';
-import { builds, buildsNote, flow, intro, kicker, lead, parts, questions, readers } from '../data/book';
+import { builds, buildsNote, flow, intro, kicker, lead, parts, questions, readers, volumes } from '../data/book';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
@@ -12,7 +12,6 @@ const s = {
   en: { title: 'About the book', toc: 'Contents', planned: 'planned', sample: 'sample available', q: 'Two questions', readers: 'Who it is for', build: 'What you build', zhNote: '' },
   zh: { title: '关于本书', toc: '目录', planned: '待写', sample: '可试读', q: '两个问题', readers: '写给谁', build: '本书要做出的东西', zhNote: '中文章名为暂定译名。' },
 }[locale];
-const samples = new Set(['00', '11']);
 ---
 
 <header class="page-head">
@@ -36,10 +35,17 @@ const samples = new Set(['00', '11']);
     <li class="chap">
       <span class="no">—</span>
       <span>{intro.title[locale]}</span>
-      <a class="tag" href={u('read/preface')}>{s.sample}</a>
+      <a class="tag" href={u('read/' + intro.slug)}>{s.sample}</a>
     </li>
   </ol>
   {parts.map((p, i) => (
+    <>
+    {(i === 0 || parts[i - 1].volume !== p.volume) && (
+      <div class="volume">
+        <h3>{volumes[p.volume].title[locale]}</h3>
+        <p>{volumes[p.volume].summary[locale]}</p>
+      </div>
+    )}
     <div class="part" id={`part-${i + 1}`}>
       <h3>{p.title[locale]}</h3>
       <p class="muted">{p.summary[locale]}</p>
@@ -48,12 +54,13 @@ const samples = new Set(['00', '11']);
           <li class:list={['chap', { planned: !c.built }]}>
             <span class="no">{c.no}</span>
             <span>{c.title[locale]}</span>
-            {samples.has(c.no) && <a class="tag" href={u('read/ch' + c.no)}>{s.sample}</a>}
+            {c.slug && <a class="tag" href={u('read/' + c.slug)}>{s.sample}</a>}
             {!c.built && <span class="tag dim">{s.planned}</span>}
           </li>
         ))}
       </ol>
     </div>
+    </>
   ))}
 </section>
 
@@ -87,6 +94,9 @@ const samples = new Set(['00', '11']);
   .chap.planned { color: var(--muted); }
   .tag { margin-left: auto; font-size: 0.75rem; padding: 0.1rem 0.6rem; border-radius: 999px; border: 1px solid var(--accent); text-decoration: none; white-space: nowrap; }
   .tag.dim { border-color: var(--line); color: var(--muted); }
+  .volume { margin: 2.6rem 0 0; padding: 1rem 1.2rem; border-left: 4px solid var(--brick); background: var(--card); }
+  .volume h3 { font-family: var(--serif); font-size: 1.3rem; margin: 0 0 0.3rem; }
+  .volume p { margin: 0; color: var(--muted); }
   .readers { display: grid; gap: 0.2rem 1rem; }
   .readers dt { font-weight: 700; margin-top: 0.8rem; }
   .readers dd { margin: 0; color: var(--muted); }

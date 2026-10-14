@@ -24,9 +24,11 @@ import check_secrets  # noqa: E402
 EXCERPTS = [
     # slug, lang, 源文件（相对书稿目录）, 截断于该标题之前（None = 全文）, 页面标题
     ('preface', 'ja', 'manuscript-ja/0-front-matter/00c-book-introduction.md', None, '序章'),
-    ('ch11', 'ja', 'manuscript-ja/1-foundations/11-core-and-ways-in.md', '## デモ環境', 'コアと、そこへ至る道'),
+    # 日文稿 2026-10-14 起为上下两卷结构，原第 11 章改为文件 12
+    ('core-and-ways-in', 'ja', 'manuscript-ja/1-foundations/12-core-and-ways-in.md', '## デモ環境', 'コアと、そこへ至る道'),
     ('preface', 'en', 'manuscript-en/0-front-matter/00c-book-introduction.md', None, 'Book Introduction'),
-    ('ch11', 'en', 'manuscript-en/1-foundations/11-core-and-ways-in.md', '## The Demonstration Environment', 'The Core and the Ways In'),
+    # 英文稿已冻结，保持旧结构与旧路径
+    ('core-and-ways-in', 'en', 'manuscript-en/1-foundations/11-core-and-ways-in.md', '## The Demonstration Environment', 'The Core and the Ways In'),
 ]
 
 FIGURE_ALLOWLIST = {'fig-01', 'fig-02', 'fig-04', 'fig-06', 'fig-07', 'fig-10', 'fig-11', 'fig-12'}

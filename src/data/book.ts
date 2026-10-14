@@ -56,34 +56,57 @@ export const channels: Record<Locale, string[]> = {
   zh: ['产品原生界面', '已发布接口', '事件、数据、文件', '厂商智能体', 'MCP 工具', '技能（Skills）', '浏览器／GUI 智能体'],
 };
 
-export interface Chapter { no: string; title: T; built: boolean }
-export interface Part { title: T; summary: T; chapters: Chapter[] }
+export interface Chapter { no: string; title: T; built: boolean; slug?: string }
+export interface Volume { title: T; summary: T }
+export interface Part { volume: 1 | 2; title: T; summary: T; chapters: Chapter[] }
 
-const ch = (no: string, ja: string, en: string, zh: string, built = true): Chapter => ({ no, title: { ja, en, zh }, built });
+const ch = (no: string, ja: string, en: string, zh: string, built = true, slug?: string): Chapter => ({ no, title: { ja, en, zh }, built, slug });
 
-export const intro: Chapter = ch('00', '序章', 'Book Introduction', '序章');
+// 章号为书稿的文件号（2026-10-14 起的上下两卷结构），读者章号在排版时另定。
+export const intro: Chapter = ch('00', '序章', 'Book Introduction', '序章', true, 'preface');
+
+export const volumes: Record<1 | 2, Volume> = {
+  1: {
+    title: { ja: '上巻', en: 'Volume One', zh: '上卷' },
+    summary: {
+      ja: 'AIが仕事の経済性を変える前に、私たちがコアの周りでどう作っていたかの記録。原則は、この手順の中から生まれた。',
+      en: 'How we built around the core before AI changed the economics of the work. The principles came out of these steps.',
+      zh: '在 AI 改变工作的经济性之前，我们如何围绕核心构建的记录。原则正是从这些步骤里长出来的。',
+    },
+  },
+  2: {
+    title: { ja: '下巻', en: 'Volume Two', zh: '下卷' },
+    summary: {
+      ja: 'AIが来てから何が変わり、何が変わらなかったかの記録。変わったのは道具の側で、コアが差し出す契約は変わっていない。',
+      en: 'What changed after AI arrived, and what did not. The tools changed; the contract the core offers did not.',
+      zh: 'AI 到来之后，什么变了、什么没变的记录。变的是工具，核心给出的契约没有变。',
+    },
+  },
+};
 
 export const parts: Part[] = [
   {
+    volume: 1,
     title: { ja: '第一部 基礎：コアを理解する', en: 'Part One — Foundations: Understanding the Core', zh: '第一部 基础：理解核心' },
     summary: {
-      ja: 'コアとは何か、そこへ至る入口にはどんな種類があるか。主事例「原価センタ」と、全書を貫く原則。',
-      en: 'What the core is and what kinds of ways in exist. The main case — cost centers — and the principle that runs through the book.',
-      zh: '什么是核心，通往它的入口有哪些。主案例「成本中心」，以及贯穿全书的原则。',
+      ja: 'コアの性質と原則を押さえる。入口の種類、主事例「原価センタ」、全書を貫く原則。',
+      en: 'The nature of the core and its principles: the ways in, the main case of cost centers, and the principle that runs through the book.',
+      zh: '把握核心的性质与原则：入口的种类、主案例「成本中心」、贯穿全书的原则。',
     },
     chapters: [
-      ch('11', 'コアと、そこへ至る道', 'The Core and the Ways In', '核心，以及通往它的路'),
-      ch('12', 'コアとともに生きる', 'Living With the Core', '与核心共处'),
-      ch('13', '主事例：原価センタ', 'The Main Case: Cost Centers', '主案例：成本中心'),
-      ch('14', '原則：正本はコアにある', 'Principles: Truth Lives in the Core', '原则：正本在核心'),
+      ch('12', 'コアと、そこへ至る道', 'The Core and the Ways In', '核心，以及通往它的路', true, 'core-and-ways-in'),
+      ch('13', 'コアとともに生きる', 'Living With the Core', '与核心共处'),
+      ch('14', '主事例：原価センタ', 'The Main Case: Cost Centers', '主案例：成本中心'),
+      ch('15', '原則：正本はコアにある', 'Principles: Truth Lives in the Core', '原则：正本在核心'),
     ],
   },
   {
+    volume: 1,
     title: { ja: '第二部 主チャネルを一歩ずつ', en: 'Part Two — The Main Channel, Step by Step', zh: '第二部 一步一步走通主通道' },
     summary: {
-      ja: 'リリース済みインターフェースを通じた読み取りと書き込みを、実際のコードで最後まで作る。',
-      en: 'Reading and writing through released interfaces, built end to end with real code.',
-      zh: '通过已发布接口读写核心，用真实代码从头做到尾。',
+      ja: '主事例を完全な形で組み立てる。各章は、動くものができあがったところで終わる。',
+      en: 'The main case, built in full. Each chapter ends when something works.',
+      zh: '把主案例完整地搭出来。每一章都在做出能跑的东西时结束。',
     },
     chapters: [
       ch('21', 'インターフェースの発見', 'Discovering the Interfaces', '发现接口'),
@@ -95,35 +118,37 @@ export const parts: Part[] = [
     ],
   },
   {
-    title: { ja: '第三部 ガバナンスとマネジメント', en: 'Part Three — Governance and Management', zh: '第三部 治理与管理' },
+    volume: 2,
+    title: { ja: '第三部 AI時代の新しいチャネル', en: 'Part Three — New Channels in the Age of AI', zh: '第三部 AI 时代的新通道' },
     summary: {
-      ja: '承認と職務分掌、変更管理、そして人とAIがひとつのチームで進めるプロジェクトの運営。',
-      en: 'Approvals and segregation of duties, change control, and running projects where people and AI work as one team.',
-      zh: '审批与职责分离、变更管理，以及人与 AI 作为一个团队推进项目。',
+      ja: 'エージェントの前提から、インターフェースに乗るチャネル、画面に向かうチャネル、ノウハウを渡すスキル、非同期のチャネルへ。',
+      en: 'From what agents assume, through channels on interfaces and at the screen, to skills that carry know-how and the asynchronous channels.',
+      zh: '从智能体的前提出发，经过走接口的通道、面向屏幕的通道、传递诀窍的技能，到异步通道。',
     },
     chapters: [
-      ch('31', 'オーナーシップ、承認、職務分掌', 'Ownership, Approvals, and Segregation of Duties', '所有权、审批与职责分离'),
-      ch('32', 'スコープ、ルール、変更管理', 'Scope, Rules, and Change Control', '范围、规则与变更管理'),
-      ch('33', '行動する主体がエージェントであるとき', 'When the Actor Is an Agent', '当行动者是智能体时'),
-      ch('34', '自分で作っていない製品の要件管理', 'Managing Requirements for a Product You Did Not Build', '管理一个不是你造的产品的需求', false),
-      ch('35', '人とAIで進めるプロジェクト', 'Running a Project With People and AI', '人与 AI 一起推进的项目'),
-      ch('36', '人とAI、ひとつのチーム', 'Humans and AI on One Team', '人与 AI，同一个团队'),
-      ch('37', 'AIとともに作り、動かすための基盤', 'The Platform for Building and Running With AI', '与 AI 一起开发与运行的平台'),
+      ch('32', 'エージェントがコアに触れる前に', 'Before Agents Touch the Core', '在智能体触碰核心之前'),
+      ch('33', 'MCP：コアをエージェントのツールとして公開する', 'MCP: Exposing the Core as Tools for Agents', 'MCP：把核心作为工具开放给智能体'),
+      ch('34', '画面の前のエージェント', 'Agents at the Screen: Browser and GUI Automation', '屏幕前的智能体'),
+      ch('35', 'スキル：コアシステムのノウハウをエージェントに渡す', 'Skills: Packaging Core-System Know-How for Agents', '技能：把核心系统的诀窍交给智能体', false),
+      ch('36', 'イベント、データ、その他のネットワークチャネル', 'Events, Data, and the Rest of the Network', '事件、数据与其他网络通道', false),
     ],
   },
   {
-    title: { ja: '第四部 AI時代の新しいチャネル', en: 'Part Four — New Channels in the Age of AI', zh: '第四部 AI 时代的新通道' },
+    volume: 2,
+    title: { ja: '第四部 技術と経営の境界：ガバナンスとマネジメント', en: 'Part Four — Technology and Management: Governance and Management', zh: '第四部 技术与经营的边界：治理与管理' },
     summary: {
-      ja: 'MCP、スキル、画面の前のエージェント、イベントとデータ。それぞれの得意と、コアとの契約の限界。',
-      en: 'MCP, skills, agents at the screen, events and data: what each does well, and where its contract with the core ends.',
-      zh: 'MCP、技能、屏幕前的智能体、事件与数据：各自擅长什么，与核心的契约到哪里为止。',
+      ja: '誰が決めるのか。誰が責任を負うのか。エージェントは承認できるのか。どのチャネルをたどっても、最後に行き着く問い。',
+      en: 'Who decides, who is accountable, can an agent approve? Every channel ends at these questions.',
+      zh: '谁来决定？谁来负责？智能体能不能审批？无论走哪条通道，最后都会走到这些问题。',
     },
     chapters: [
-      ch('41', 'エージェントがコアに触れる前に', 'Before Agents Touch the Core', '在智能体触碰核心之前'),
-      ch('42', 'MCP：コアをエージェントのツールとして公開する', 'MCP: Exposing the Core as Tools for Agents', 'MCP：把核心作为工具开放给智能体'),
-      ch('43', 'スキル：コアシステムのノウハウをエージェントに渡す', 'Skills: Packaging Core-System Know-How for Agents', '技能：把核心系统的诀窍交给智能体', false),
-      ch('44', '画面の前のエージェント', 'Agents at the Screen: Browser and GUI Automation', '屏幕前的智能体', false),
-      ch('45', 'イベント、データ、その他のネットワークチャネル', 'Events, Data, and the Rest of the Network', '事件、数据与其他网络通道', false),
+      ch('41', 'オーナーシップ、承認、職務分掌', 'Ownership, Approvals, and Segregation of Duties', '所有权、审批与职责分离'),
+      ch('42', 'スコープ、ルール、変更管理', 'Scope, Rules, and Change Control', '范围、规则与变更管理'),
+      ch('43', '行動する主体がエージェントであるとき', 'When the Actor Is an Agent', '当行动者是智能体时'),
+      ch('44', '自分で作っていない製品の要件管理', 'Managing Requirements for a Product You Did Not Build', '管理一个不是你造的产品的需求', false),
+      ch('45', '人とAIで進めるプロジェクト', 'Running a Project With People and AI', '人与 AI 一起推进的项目'),
+      ch('46', '人とAI、ひとつのチーム', 'Humans and AI on One Team', '人与 AI，同一个团队'),
+      ch('47', 'AIとともに作り、動かすための基盤', 'The Platform for Building and Running With AI', '与 AI 一起开发与运行的平台'),
     ],
   },
 ];
