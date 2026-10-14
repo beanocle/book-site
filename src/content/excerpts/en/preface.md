@@ -4,7 +4,7 @@ lang: en
 slug: preface
 status: draft
 excerpt: false
-imported: 2026-10-13
+imported: 2026-10-14
 ---
 
 APIs, MCP, Skills, and Browser Agents — with SAP S/4HANA as the Worked Example
